@@ -1,0 +1,13 @@
+<?php
+namespace {%namespace%}\logic;
+
+use app\common\logic\Base;
+
+/**
+ * {%classTitle%}逻辑
+ * @package {%namespace%}\logic
+ */
+class {%className%} extends Base
+{
+    
+}

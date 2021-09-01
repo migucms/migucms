@@ -1,0 +1,66 @@
+{notempty name="$buildTable['filter']"}
+    <div class="layui-form migu-search {:isset($buildTable['filter']['display']) ? $buildTable['filter']['display'] : 'hide'}">
+        <form action="{:isset($buildTable['filter']['action']) ? $buildTable['filter']['action'] : url('', input('param.'))}" method="get" id="migu-table-search">
+            {volist name="$buildTable['filter']['items']" id="v"}
+                {switch $v['type']}
+                    {case year|month|date|time|datetime}
+                        <div class="layui-form-item" style="{:isset($v['style']) ? $v['style'] : ''}">
+                            <label class="layui-form-label">{$v['title']}</label>
+                            <div class="layui-input-inline">
+                                <input type="text" class="layui-input layui-date" laydata-type="{$v['type']}" laydata-name="{$v['name']}" placeholder="{:isset($v['placeholder']) ? $v['placeholder'] : ''}" laydata-options='{:isset($v['options']) ? json_encode($v['options'], 1) : ''}' laydata-format="{:isset($v['format']) ? $v['format'] : ''}" name="{$v['name']}" />
+                            </div>
+                        </div>
+                    {/case}
+
+                    {case select|radio}
+                        <div class="layui-form-item" style="{:isset($v['style']) ? $v['style'] : ''}">
+                            <label class="layui-form-label">{$v['title']}</label>
+                            <div class="layui-input-inline">
+                                <select name="{$v['name']}" {if (isset($v['search']))}lay-search=""{/if}>
+                                    <option value="">请选择...</option>
+                                    {foreach name="$v['option']" id="vv" key="kk"}
+                                        <option value="{$kk}" {if (isset($v['value']) && $v['value'] == $kk)}selected{/if}>{$vv}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+                    {/case}
+
+                    {case xmselect|select+}
+                        <!--下拉框增强版-->
+                        <div class="layui-form-item" style="{:isset($v['style']) ? $v['style'] : ''}" id="hs-item-{$v['name']}">
+                            <label class="layui-form-label">{$v['title']|raw}</label>
+                            <div class="layui-input-inline">
+                                <div id="hs-xmselect-{$v['name']}" data-field="{$v['name']}" lay-data='{:json_encode(isset($v['options']) ? $v['options'] : [], 1)}' class="xm-select"></div>
+                            </div>
+                        </div>
+                    {/case}
+
+                    {case html}
+                        {$hsv['html']|raw}
+                    {/case}
+
+                    {case hidden}
+                        <input type="hidden" name="{$v['name']}" value="{$v['value']}"  />
+                    {/case}
+
+                    {include file="system@builder/table_filter_extend" /}
+
+                    {default /}
+                        <div class="layui-form-item" style="{:isset($v['style']) ? $v['style'] : ''}">
+                            <label class="layui-form-label">{$v['title']}</label>
+                            <div class="layui-input-inline">
+                                <input type="text" class="layui-input" name="{$v['name']}" placeholder="{:isset($v['placeholder']) ? $v['placeholder'] : ''}" value="{$v['value'] ?? ''}" />
+                            </div>
+                        </div>
+                {/switch}
+            {/volist}
+            <div class="layui-form-item migu-search-btn">
+                <div class="layui-input-inline" style="width:90%;">
+                <button type="submit" class="layui-btn layui-btn-normal layui-icon layui-icon-search">查询</button>
+                {if (isset($buildTable['filter']['resetBtn']) && !$buildTable['filter']['resetBtn'])}<button type="reset" class="layui-btn layui-btn-primary layui-icon layui-icon-delete">重置</button>{/if}
+                </div>
+            </div>
+        </form>
+    </div>
+{/notempty}

@@ -1,0 +1,71 @@
+<table id="dataTable" lay-filter="dataTable"></table>
+{include file="block/layui" /}
+<script type="text/html" title="状态模板" id="statusTpl">
+    <input type="checkbox" name="status" value="{{ d.status }}" lay-skin="switch" lay-filter="switchStatus" lay-text="正常|关闭" {{ d.status == 1 ? 'checked' : '' }} {{ d.system == 1 ? 'disabled' : '' }} data-href="{:url('status')}?table=admin_config&id={{ d.id }}">
+</script>
+
+<script type="text/html" title="排序模板" id="sortTpl">
+    <input type="text" class="layui-input migu-ajax-input input-sort" onkeyup="value=value.replace(/[^\d]/g,'')" value="{{ d.sort }}" data-value="{{ d.id }}" data-href="{:url('sort')}?table=admin_config&id={{ d.id }}">
+</script>
+
+<script type="text/html" title="操作按钮模板" id="buttonTpl">
+    {{# if (d.system != 1) { }}
+        <a href="{:url('edit')}?id={{ d.id }}" class="layui-btn layui-btn-xs layui-btn-normal">修改</a><a href="{:url('del')}?id={{ d.id }}" class="layui-btn layui-btn-xs layui-btn-danger migu-tr-del">删除</a>
+    {{# } else { }}
+        <a href="javascript:void(0);" title="系统配置，禁止编辑" class="layui-btn layui-btn-xs layui-btn-normal layui-disabled">修改</a><a href="javascript:void(0);" title="系统配置，禁止删除" class="layui-btn layui-btn-xs layui-btn-danger layui-disabled">删除</a>
+    {{# } }}
+</script>
+
+<script type="text/html" id="toolbar">
+    <div class="migu-table-tool">
+        <a href="{:url('add?group='.input('param.group'))}" class="layui-btn layui-btn-normal layui-btn-sm">添加</a><a data-href="{:url('status?val=1')}" class="layui-btn layui-btn-sm migu-table-ajax" data-table="dataTable">启用</a><a data-href="{:url('status?val=0')}" class="layui-btn layui-btn-warm layui-btn-sm migu-table-ajax" data-table="dataTable">禁用</a><a data-href="{:url('del')}" class="layui-btn layui-btn-danger layui-btn-sm migu-table-ajax confirm">删除</a><a data-href="{:url('delGroup', ['group' => input('param.group/s', 'base')])}" class="layui-btn layui-btn-danger layui-btn-sm migu-ajax" confirm="删除之后无法恢复，你确认要执行吗？">删除当前组</a>
+    </div>
+</script>
+
+<script type="text/javascript">
+    layui.use(['table', 'jquery', 'layer'], function() {
+        var table = layui.table, formType = {:json_encode(form_type())}, 
+            $ = layui.jquery, layer = layui.layer;
+        table.render({
+            elem: '#dataTable'
+            ,url: '{:url('?group='.input('param.group/s', 'base'))}' //数据接口
+            ,page: true //开启分页
+            ,limit: 20
+            ,text: {
+                none : '暂无相关数据'
+            }
+            ,toolbar: '#toolbar'
+            ,defaultToolbar: false
+            ,cols: [[ //表头
+                {type:'checkbox'}
+                ,{field: 'name', title: '名称'}
+                ,{field: 'title', title: '标题'}
+                ,{field: 'type', title: '类型', width: 100}
+                ,{field: 'sort', title: '排序', width: 80, edit: 'text'}
+                ,{field: 'status', title: '状态', width: 100, templet: '#statusTpl'}
+                ,{title: '操作', width: 120, templet: '#buttonTpl'}
+            ]],
+            done: function() {
+                layui.global.tableEdit.init();
+            }
+        });
+        
+        $('#miguAddGroup').on('click', function(){
+            layer.prompt({
+                title: '添加分组',
+            }, function(value, index, elem) {
+
+                $.post("{:url('addGroup')}", {name: value}, function(res) {
+                    if (res.code == 0) {
+                        layer.msg(res.msg);
+                    } else {
+                        location.href = res.url;
+                        layer.close(index);
+                    }
+                }, 'json');
+            });
+            $('.layui-layer-input').attr('placeholder', '别名:标题，示例：user:会员');
+            return false;
+        });
+    });
+</script>

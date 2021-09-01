@@ -1,0 +1,88 @@
+{include file="system@block/header" /}
+<div class="layui-fluid">
+    {notempty name="$pageTips"}
+    <div class="migu-pagetips">
+        {if (isset($pageTips['style']) && $pageTips['style'] == 'fieldset')}
+            <fieldset class="layui-elem-field {$pageTips['class'] ?? ''}">
+                <legend>{$pageTips['title'] ?? '友情提示'}</legend>
+                <div class="layui-field-box">
+                    {$pageTips['content']}
+                </div>
+            </fieldset>
+        {elseif (isset($pageTips['style']) && $pageTips['style'] == 'panel')}
+            <div class="layui-collapse">
+                <div class="layui-colla-item">
+                    <h2 class="layui-colla-title">{$pageTips['title'] ?? '友情提示'}</h2>
+                    <div class="layui-colla-content {$pageTips['class'] ?? ''}">
+                        <p>{$pageTips['content']}</p>
+                    </div>
+                </div>
+            </div>
+        {else /}
+            <blockquote class="layui-elem-quote {$pageTips['class'] ?? ''}">{$pageTips['content']}</blockquote>
+        {/if}
+    </div>
+    {/notempty}
+    {switch name="$miguTabType"}
+        {case value="1"}
+            <!--单个分组-->
+            <div class="layui-card" id="migu-card-head">
+                <div class="layui-card-header">
+                    {$miguCurMenu['title']|raw}
+                </div>
+                <div class="layui-card-body migu-card-body">{__CONTENT__}</div>
+            </div>
+        {/case}
+        {case value="2"}
+            <!--多个分组[无刷新]-->
+            <div class="layui-card" id="migu-card-head">
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title">
+                        {volist name="miguTabData['menu']" id="vo" key="k"}
+                            {if ($k eq 1)}
+                                <li class="layui-this">
+                            {else /}
+                                <li>
+                            {/if}
+                                <a href="javascript:;" class="{if (isset($vo['class']))}{$vo['class']}{/if}" id="{if (isset($vo['id']))}{$vo['id']}{/if}">{$vo['title']|raw}</a>
+                            </li>
+                        {/volist}
+                    </ul>
+                    <div class="layui-tab-content migu-tab-content">{__CONTENT__}</div>
+                </div>
+            </div>
+        {/case}
+        {case value="3"}
+            <!--多个分组[刷新]-->
+            <div class="layui-card" id="migu-card-head">
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title">
+                        {volist name="miguTabData['menu']" id="vo"}
+                            {php}
+                                $miguTabData['current'] = isset($miguTabData['current']) ? $miguTabData['current'] : '';
+                            {/php}
+                            {if ($vo['url'] eq $miguCurMenu['url'] or (url($vo['url']) eq $miguTabData['current']))}
+                                <li class="layui-this">
+                            {else /}
+                                <li>
+                            {/if}
+                                {if (substr($vo['url'], 0, 4) eq 'http')}
+                                    <a href="{$vo['url']}" target="_blank">{$vo['title']|raw}</a>
+                                {else /}
+                                    <a href="{:url($vo['url'])}" class="{if (isset($vo['class']))}{$vo['class']}{/if}" id="{if (isset($vo['id']))}{$vo['id']}{/if}">{$vo['title']|raw}</a>
+                                {/if}
+                            </li>
+                        {/volist}
+                    </ul>
+                    <div class="layui-card-body migu-card-body">{__CONTENT__}</div>
+                </div>
+            </div>
+        {/case}
+        {default /}
+        <!--无分组-->
+        <div class="layui-card migu-card">
+            {__CONTENT__}
+        </div>
+    {/switch}
+</div>
+{include file="system@block/footer" /}

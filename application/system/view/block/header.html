@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{if condition="$miguCurMenu['url'] eq 'system/index/index'"}管理控制台{else /}{$miguCurMenu['title']}{/if} -  Powered by {:config('mgcms.name')}</title>
+    {include file="system@block/head" /}
+    <script>
+        var HSIFRAME = false;
+    </script>
+{if (input('param.migu_iframe') || cookie('migu_iframe'))}
+    </head>
+    <body>
+{else /}
+    </head>
+    <body>
+        <div class="{if (cookie('migu_menu_layout') == 1)}migu-menu-layout{/if}" id="migu-layout">
+            {include file="system@block/menu" /}
+            <div class="migu-body  migu-iframe{:input('cookie.migu_iframe', 0)}">
+                <div class="hs-tabs-item">
+{/if}

@@ -1,0 +1,383 @@
+{volist name="$form['items']" id="hsv"}
+    {if (isset($hsv['grid']))}
+        <div class="layui-col-xs{$hsv['grid'][0] ?? '12'} layui-col-sm{$hsv['grid'][1] ?? '12'} layui-col-md{$hsv['grid'][2] ?? '12'} layui-col-md{$hsv['grid'][3] ?? '12'}">
+    {else /}
+        <div>
+    {/if}
+    {switch $hsv['type']}
+        {case txt}
+            <!--文本展示-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name'] ?? ''}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline" style="color:{$hsv['color'] ?? ''};">
+                    {$hsv['value']|raw}
+                </div>
+            </div>
+        {/case}
+        {case textarea}
+            <!--文本域-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline">
+                    <textarea {:isset($hsv['disabled']) ? 'disabled="disabled"' : ''} {:isset($hsv['readonly']) ? 'readonly="readonly"' : ''} class="layui-textarea field-{$hsv['name']} {$hsv['class'] ?? ''}" {:isset($hsv['id']) ? 'id="'.$hsv['id'].'"' : ''} name="{$hsv['name']}" placeholder="{$hsv['placeholder'] ?? ''}" lay-verify="{$hsv['verify'] ?? ''}">{$hsv['value'] ?? ''}</textarea>
+                </div>
+                {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+            </div>
+        {/case}
+
+        {case year|month|date|time|datetime}
+            <!--日期-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input layui-date field-{$hsv['name']} {$hsv['class'] ?? ''}" {:isset($hsv['id']) ? 'id="'.$hsv['id'].'"' : ''} laydata-type="{$hsv['type']}" laydata-options='{:isset($v['options']) ? json_encode($v['options'], 1) : ''}' laydata-name="{$hsv['name']}" laydata-format="{$hsv['format'] ?? ''}" name="{$hsv['name']}" {$hsv['disabled'] ? 'disabled="disabled"' : ''} {$hsv['readonly'] ? 'readonly="readonly"' : ''} placeholder="{$hsv['placeholder'] ?? ''}" lay-verify="{$hsv['verify'] ?? ''}" value="{$hsv['value'] ?? ''}" />
+                </div>
+                {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+            </div>
+        {/case}
+
+        {case editor}
+            {php} $editors[$hsv['name']] = $hsv['editor'] ?? ''; {/php}
+            <!--编辑器-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}" style="overflow:hidden;">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-block">
+                    <textarea class="migu-editor" id="editor-{$hsv['name']}" class="field-{$hsv['name']}" name="{$hsv['name']}">{if (isset($formData[$hsv['name']]))}{:htmlspecialchars_decode($formData[$hsv['name']])}{elseif (isset($hsv['value'])) /}{$hsv['value']|raw}{/if}</textarea>
+                </div>
+            </div>
+        {/case}
+
+        {case file}
+            <!--单文件-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline upload-item">
+                    <input type="text" placeholder="请上传文件或输入文件链接" class="layui-input file-input field-{$hsv['name']}" name="{$hsv['name']}" value="{$hsv['value'] ?? ''}" lay-verify="{$hsv['verify'] ?? ''}" />
+                    <button type="button" name="upload" class="layui-btn layui-btn-primary layui-upload" lay-data="{accept:'file', exts: '{$hsv['exts'] ?? ''}', url: '{:isset($hsv['url']) ? $hsv['url'] : url('upload')}'}" {$hsv['disabled'] ? 'disabled="disabled"' : ''}><i class="layui-icon layui-icon-upload"></i></button>
+                    <div class="upload-preview"></div>
+                </div>
+                {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+            </div>
+        {/case}
+
+        {case files}
+            <!--多文件-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline">
+                    <ul class="migu-form-files">
+                        {if (isset($formData[$hsv['name']]) && !empty($formData[$hsv['name']]))}
+                            {php}
+                                $files = is_array($formData[$hsv['name']]) ? $formData[$hsv['name']] : json_decode($formData[$hsv['name']], 1);
+                            {/php}
+                            {foreach name="$files" id="hsvv" key="hskk"}
+                            <li class="upload-item">
+                                <input type="text" name="{$hsv['name']}[{$hskk}][desc]" class="layui-input files-desc files-{$hsv['name']}-desc" placeholder="文件标题" value="{$hsvv['desc']}" />
+                                <input type="text" name="{$hsv['name']}[{$hskk}][path]" class="layui-input files-path files-{$hsv['name']}-path file-input" placeholder="请上传文件或输入文件链接" value="{$hsvv['path']}" />
+                                <button type="button" name="upload" class="layui-btn layui-btn-primary layui-upload" id="files-{$hsv['name']}-upload-btn{$hskk}" lay-type="files" lay-data="{accept:'file', exts: '{$hsv['exts'] ?? ''}', url: '{:isset($hsv['url']) ? $hsv['url'] : url('upload')}'}"><i class="layui-icon layui-icon-upload"></i></button><a href="javascript:;" class="fa fa-minus-circle files-del" data-field="{$hsv['name']}"></a><a href="javascript:;" class="fa fa-plus-circle files-add" data-field="{$hsv['name']}"></a>
+                            </li>
+                            {/foreach}
+                        {else /}
+                            <li class="upload-item">
+                                <input type="text" name="{$hsv['name']}[0][desc]" class="layui-input files-desc files-{$hsv['name']}-desc" placeholder="文件标题" />
+                                <input type="text" name="{$hsv['name']}[0][path]" class="layui-input files-path files-{$hsv['name']}-path file-input" placeholder="请上传文件或输入文件链接" />
+                                <button type="button" name="upload" class="layui-btn layui-btn-primary layui-upload" id="files-{$hsv['name']}-upload-btn0" lay-type="files" lay-data="{accept:'file', exts: '{$hsv['exts'] ?? ''}', url: '{:isset($hsv['url']) ? $hsv['url'] : url('upload')}'}"><i class="layui-icon layui-icon-upload"></i></button><a href="javascript:;" class="fa fa-minus-circle files-del" data-field="{$hsv['name']}"></a><a href="javascript:;" class="fa fa-plus-circle files-add" data-field="{$hsv['name']}"></a>
+                            </li>
+                        {/if}
+                    </ul>
+                </div>
+                {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+            </div>
+        {/case}
+
+        {case image}
+            <!--单图-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline upload-item">
+                    <input type="text" class="layui-input file-input field-{$hsv['name']}" name="{$hsv['name']}" value="{$hsv['value'] ?? ''}" placeholder="请上传图片或输入图片链接" lay-verify="{$hsv['verify'] ?? ''}" />
+                    <button type="button" name="upload" class="layui-btn layui-btn-primary layui-upload" lay-data="{accept:'image', exts: '{$hsv['exts'] ?? ''}', url: '{:isset($hsv['url']) ? $hsv['url'] : url('upload')}'}" lay-type="image" {$hsv['disabled'] ? 'disabled="disabled"' : ''}><i class="layui-icon layui-icon-upload"></i></button>
+                    <div class="upload-preview"><img class="migu-img-preview" src="{:isset($formData[$hsv['name']]) && $formData[$hsv['name']] ? $formData[$hsv['name']] : '/static/system/image/theme.png'}" /></div>
+                </div>
+                {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+            </div>
+        {/case}
+
+        {case images}
+            <!--多图-->
+            <div class="layui-form-block" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline fl">
+                    <input type="hidden" name="{$hsv['name']}" value="" />
+                    <ul class="migu-form-images">
+                        {if (isset($formData[$hsv['name']]) && !empty($formData[$hsv['name']]))}
+                            {php}
+                                $images = is_array($formData[$hsv['name']]) ? $formData[$hsv['name']] : json_decode($formData[$hsv['name']], 1);
+                            {/php}
+                            {foreach name="$images" id="hsvv" key="hskk"}
+                            <li>
+                                <div class="img"><img src="{$hsvv['path']}" /></div>
+                                <input type="hidden" name="{$hsv['name']}[{$hskk}][path]" class="photo-{$hsv['name']}-path" value="{$hsvv['path']}" />
+                                <input type="hidden" name="{$hsv['name']}[{$hskk}][desc]" class="photo-desc-input photo-{$hsv['name']}-desc" value="{$hsvv['desc']}" />
+                                <i class="layui-icon layui-icon-edit photo-desc-edit" data-field="{$hsv['name']}" title="编辑图片描述"></i>
+                                <i class="layui-icon layui-icon-delete migu-photo-delete" data-field="{$hsv['name']}" title="删除图片" data-path="{$hsvv['path']}"></i>
+                                <i class="layui-icon layui-icon-prev" data-field="{$hsv['name']}" title="向前移动"></i>
+                                <i class="layui-icon layui-icon-next" data-field="{$hsv['name']}" title="向后移动"></i>
+                            </li>
+                            {/foreach}
+                        {/if}
+                        <li class="upload-btn migu-upload-photo" lay-type="image" lay-data="{accept:'image', exts: '{$hsv['exts'] ?? ''}', url: '{:isset($hsv['url']) ? $hsv['url'] : url('upload')}'}" data-field="{$hsv['name']}" /><i class="layui-icon layui-icon-upload"></i>上传图片
+                        </li>
+                    </ul>
+                </div>
+                {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux" style="text-indent:10px;">{$hsv['tips']|raw}</div>{/if}
+            </div>
+        {/case}
+
+        {case switch}
+            <!--开关-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline">
+                    <input type="checkbox" class="field-{$hsv['name']}" lay-filter="{$hsv['name']}" name="{$hsv['name']}" lay-skin="switch" lay-text="{:isset($hsv['text']) ? $hsv['text'] : 'ON|OFF'}" {:isset($hsv['disabled']) ? 'disabled="disabled"' : ''} {:isset($hsv['value']) && $hsv['value'] == 1 && !isset($formData[$hsv['name']]) ? 'checked' : ''} value="{:isset($hsv['value']) ? $hsv['value'] : 0}" />
+                </div>
+                {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+            </div>
+        {/case}
+
+        {case radio}
+            <!--单选-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline">
+                    {foreach name="$hsv['option']" id="hsvv" key="hskk"}
+                        <input type="radio" class="field-{$hsv['name']} {$hsv['class'] ?? ''}" name="{$hsv['name']}" lay-filter="{$hsv['name']}" value="{$hskk}" title="{$hsvv}" {if (isset($hsv['value']) && $hskk == $hsv['value'])}checked{/if} />
+                    {/foreach}
+                </div>
+                {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+            </div>
+        {/case}
+
+        {case checkbox}
+            <!--多选-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline">
+                    {foreach name="$hsv['option']" id="hsvv" key="hskk"}
+                        <input type="checkbox" class="field-{$hsv['name']} {$hsv['class'] ?? ''}" name="{$hsv['name']}[]"  {:isset($hsv['disabled']) ? 'disabled="disabled"' : ''} lay-filter="{$hsv['name']}" lay-skin="{$hsv['skin'] ?? ''}" value="{$hskk}" title="{$hsvv}" {if (isset($hsv['value']) && !isset($formData[$hsv['name']]) && in_array($hskk, parse_attr($hsv['value'])))}checked{/if}>
+                    {/foreach}
+                </div>
+                {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+            </div>
+        {/case}
+
+        {case select}
+            <!--下拉框-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline">
+                    <select name="{$hsv['name']}" {if (isset($hsv['search']))}lay-search=""{/if} class="field-{$hsv['name']} {$hsv['class'] ?? ''}" {:isset($hsv['id']) ? 'id="'.$hsv['id'].'"' : ''} type="select" lay-verify="{$hsv['verify'] ?? ''}" {$hsv['disabled'] ? 'disabled="disabled"' : ''} {$hsv['readonly'] ? 'readonly="readonly"' : ''} lay-filter="{$hsv['name']}">
+                        <option value="">请选择</option>
+                        {if (is_array($hsv['option']))}
+                            {foreach name="$hsv['option']" id="hsvv" key="hskk"}
+                                <option value="{$hskk}" {if (isset($hsv['value']) && $hskk eq $hsv['value'])}selected{/if}>{$hsvv|raw}</option>
+                            {/foreach}
+                        {else /}
+                            {$hsv['option']|raw}
+                        {/if}
+                    </select>
+                </div>
+                {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+            </div>
+        {/case}
+
+        {case xmselect|select+}
+            <!--下拉框增强版-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline">
+                    <div id="hs-xmselect-{$hsv['name']}" data-field="{$hsv['name']}" lay-data='{:json_encode(isset($hsv['options']) ? $hsv['options'] : [], 1)}' class="xm-select"></div>
+                </div>
+            {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+            </div>
+        {/case}
+
+        {case password}
+            <!--密码框-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline migu-pwd-input-inline">
+                    <input type="password" class="layui-input field-{$hsv['name']} {$hsv['class'] ?? ''}" {:isset($hsv['id']) ? 'id="'.$hsv['id'].'"' : ''} name="{$hsv['name']}" {$hsv['disabled'] ? 'disabled="disabled"' : ''} {$hsv['readonly'] ? 'readonly="readonly"' : ''} placeholder="{$hsv['placeholder'] ?? ''}" lay-verify="{$hsv['verify'] ?? ''}" value="{$hsv['value'] ?? ''}" />
+                    <i class="migu-pwd-toggle-btn fa fa-eye-slash"></i>
+                </div>
+                {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+            </div>
+        {/case}
+
+        {case tag}
+            <!--标签-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline">
+                    <div class="migu-input-tags"><input type="hidden" class="input field-{$hsv['name']}" name="{$hsv['name']}" value="{$hsv['value'] ?? ''}" lay-verify="{$hsv['verify'] ?? ''}" data-split="{$hsv['split'] ?? ','}" data-background="{$hsv['background'] ?? ''}" /><input type="text" placeholder="回车生成标签" class="migu-input-tag" />
+                    </div>
+                </div>
+                {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+            </div>
+        {/case}
+
+        {case color}
+            <!--颜色选择器-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="{$hsv['name']}" value="{$hsv['value'] ?? ''}" placeholder="请选择颜色" class="layui-input field-{$hsv['name']}" lay-verify="{$hsv['verify'] ?? ''}" id="layui-colorpicker-input-{$hsv['name']}" {$hsv['readonly'] ? 'readonly="readonly"' : ''} lay-data='{:json_encode(isset($hsv['options']) ? $hsv['options'] : [], 1)}' style="display:inline-block;width:70%;"><div class="migu-colorpicker" style="margin:-2px 0 0 -1px;display:inline-block;" data-name="{$hsv['name']}" id="layui-colorpicker-{$hsv['name']}"></div>
+                </div>
+                {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+            </div>
+        {/case}
+
+        {case slider}
+            <!--滑块-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline migu-slider-inline" lay-data='{:json_encode(isset($hsv['options']) ? $hsv['options'] : [], 1)}' data-field="{$hsv['name']}">
+                    <div class="slider-block" id="slider-{$hsv['name']}"></div>
+                    <input type="hidden" class="field-{$hsv['name']}" name="{$hsv['name']}" lay-verify="{$hsv['verify'] ?? ''}" value="{if (isset($formData[$hsv['name']]))}{$formData[$hsv['name']]}{else /}{:isset($hsv['options']['value']) ? implode(',', $hsv['options']['value']) : 0}{/if}" />
+                </div>
+                {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+            </div>
+        {/case}
+
+        {case rate}
+            <!--评分-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline migu-form-rate" lay-data='{:json_encode(isset($hsv['options']) ? $hsv['options'] : [], 1)}' data-field="{$hsv['name']}">
+                    <div id="rate-{$hsv['name']}"></div>
+                    <input type="hidden" class="field-{$hsv['name']}" name="{$hsv['name']}" lay-verify="{$hsv['verify'] ?? ''}" value="{if (isset($formData[$hsv['name']]))}{$formData[$hsv['name']]}{else /}{:isset($hsv['options']['value']) ? $hsv['options']['value'] : 0 }{/if}" />
+                </div>
+                {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+            </div>
+        {/case}
+
+        {case progress}
+            <!--进度条-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline">
+                    <div style="width:95%;margin-top:{:isset($hsv['big_size']) ? '10px' : '20px'};" class="layui-progress {:isset($hsv['big_size']) ? 'layui-progress-big' : ''}" {:isset($hsv['show_text']) ? 'lay-showPercent="yes"' : ''}>
+                        <div class="layui-progress-bar" lay-percent="{:isset($formData[$hsv['name']]) ? $formData[$hsv['name']] : (isset($hsv['value']) ? $hsv['value'] : 0)}" style="{:isset($hsv['background']) ? 'background-color:'.$hsv['background'].';' : ''}"></div>
+                    </div>
+                </div>
+            </div>
+        {/case}
+
+        {case transfer}
+            <!--穿梭框-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-block migu-form-transfer" lay-data='{:json_encode(isset($hsv['options']) ? $hsv['options'] : [], 1)}' data-field="{$hsv['name']}">
+                    <div id="transfer-{$hsv['name']}"></div>
+                    <input type="hidden" name="{$hsv['name']}" class="field-{$hsv['name']}" lay-verify="{$hsv['verify'] ?? ''}" value="{:isset($formData[$hsv['name']]) ? (is_array($formData[$hsv['name']]) ? implode(',', $formData[$hsv['name']]) : $formData[$hsv['name']]) : (isset($hsv['options']['value']) ? implode(',', $hsv['options']['value']) : '')}" />
+                </div>
+            </div>
+        {/case}
+
+        {case tree}
+            <!--树形-->
+            {if (isset($formData[$hsv['name']]))}{php}$hsv['options']['value']=$formData[$hsv['name']];{/php}{/if}
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline migu-form-tree" lay-data='{:json_encode(isset($hsv['options']) ? $hsv['options'] : [], 1)}' data-field="{$hsv['name']}">
+                    <div id="tree-{$hsv['name']}"></div>
+                    <input type="hidden" name="{$hsv['name']}" class="field-{$hsv['name']}" lay-verify="{$hsv['verify'] ?? ''}" value="{if (isset($formData[$hsv['name']]))}{if (is_array($formData[$hsv['name']]))}{:implode(',', $formData[$hsv['name']])}{else /}{$formData[$hsv['name']]}{/if}{elseif (isset($hsv['options']['value']))}{if (is_array($hsv['options']['value']))}{:implode(',', $hsv['options']['value'])}{else /}{$hsv['options']['value']}{/if}{/if}" />
+                </div>
+                {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+            </div>
+        {/case}
+
+        {case linkage}
+            <!--联动-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline">
+                    <div class="migu-linkage" lay-data='{:json_encode($hsv, 1)}' data-field="{$hsv['name']}" id="linkage-{$hsv['name']}"></div>
+                </div>
+                {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+            </div>
+        {/case}
+
+        {case html}
+            <!--自定义-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                {$hsv['html']|raw}
+            </div>
+        {/case}
+
+        {case hidden}
+            <!--隐藏域-->
+            <input type="hidden" class="field-{$hsv['name']}" id="hs-item-{$hsv['name']}" name="{$hsv['name']}" value="{$hsv['value'] ?? ''}" />
+        {/case}
+
+        {case line}
+            <fieldset class="layui-elem-field layui-field-title" id="hs-item-{$hsv['name'] ?? ''}">
+                {if (isset($hsv['title']) && $hsv['title'])}<legend>{$hsv['title']|raw}</legend>{/if}
+            </fieldset>
+        {/case}
+
+        {case icon}
+        <!--图标-->
+        <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']}</label>
+                <div class="layui-input-inline hs-icon-input">
+                    <i class="{if (isset($formData[$hsv['name']]))}{$formData[$hsv['name']]}{/if}" id="form-icon-show-{$hsv['name']}" ></i>
+                    <input type="text" class="layui-input form-icon-input field-{$hsv['name']}" id="icon-input-{$hsv['name']}" name="{$hsv['name']}" autocomplete="off" placeholder="{$hsv['placeholder'] ?? ''}" lay-verify="{$hsv['verify'] ?? ''}" value="{$hsv['value'] ?? ''}" style="width:70%;display: inline-block;">
+                    <a href="{:url('system/publics/icon?input=icon-input-'.$hsv['name'].'&show=form-icon-show-'.$hsv['name'])}" title="选择图标" class="layui-btn layui-btn-normal layui-btn-xs migu-iframe-pop">选择图标</a>
+                </div>
+            </div>
+        {/case}
+
+        {case table}
+        <!--数据表格-->
+            {php}
+            if(isset($hsv['data'])) sort($hsv['data']);
+            $tables[$hsv['name']] = $hsv;
+            {/php}
+            <!--表格-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline">
+                    <table class="layui-table" id="hs-table-{$hsv['name']}">
+                        <thead>
+                            <tr>
+                                {foreach name="$hsv['cols']" id="v"}
+                                    <th>{$v['title']}</th>
+                                {/foreach}
+                                <th width="60">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="{:count($hsv['cols'])+1}"><a href="javascript:;" data-field="{$hsv['name']}" class="layui-btn layui-btn-xs layui-icon layui-icon-add-1 migu-form-add-tr" data-index="0">追加</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {/case}
+        
+        {include file="system@builder/form_item_extend" /}
+        
+        {default /}
+            <!--文本框-->
+            <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+                <label class="layui-form-label">{$hsv['title']|raw}</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input field-{$hsv['name']} {$hsv['class'] ?? ''}" {:isset($hsv['id']) ? 'id="'.$hsv['id'].'"' : ''} name="{$hsv['name']}" {$hsv['disabled'] ? 'disabled="disabled"' : ''} {$hsv['readonly'] ? 'readonly="readonly"' : ''} placeholder="{$hsv['placeholder'] ?? ''}" lay-verify="{$hsv['verify'] ?? ''}" value="{$hsv['value'] ?? ''}" />
+                </div>
+                {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+            </div>
+    {/switch}
+    </div>
+{/volist}

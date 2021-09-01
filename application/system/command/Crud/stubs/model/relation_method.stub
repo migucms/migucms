@@ -1,0 +1,7 @@
+    
+    // 一对一模型关联
+    public function {%relationMethod%}()
+    {
+        return $this->{%relationMode%}('{%relationModel%}', '{%ForeignKey%}', '{%PrimaryKey%}');
+    }
+    

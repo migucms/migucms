@@ -1,0 +1,67 @@
+<?php
+namespace {%namespace%}\admin;
+
+use app\system\admin\Admin;
+
+/**
+ * {%classTitle%}控制器
+ */
+class {%className%} extends Admin
+{
+    // [通用添加、修改] 模型名称，格式：模块名/模型名
+    protected $miguModel = '{%modelName%}';
+    // [通用添加、修改] 表名(不含表前缀) 
+    protected $miguTable = '{%tableName%}';
+    // [通用添加、修改] 验证器类，格式：app\模块\validate\验证器类名
+    protected $miguValidate = '{%validateClass%}';
+    // [通用添加] 添加数据验证场景名
+    protected $miguAddScene = '{%addScene%}';
+    // [通用更新] 更新数据验证场景名
+    protected $miguEditScene = '{%editScene%}';
+    // [通用更新] 只读字段定义
+    protected $miguReadonly = [];
+    // 当前控制器无需鉴权的白名单，但要登录（写方法名即可）
+    protected $miguNoAuth = [];
+    // 表单赋值
+    protected $formData = [];
+    // 数据权限设置，可选值：own 个人，org 组织，false 不启用
+    protected $dataRight = {%dataRight%};
+    // 数据权限字段名
+    protected $dataRightField = '{%dataRightField%}';
+
+    public function index()
+    {
+        if ($this->request->isAjax()) {
+            $page = $this->request->param('page/d', 1);
+            $limit = $this->request->param('limit/d', 20);
+            $params = $this->request->only('{%filterField%}');
+
+            $where = [];
+            
+            foreach($params as $k => $v) {
+                ($v || is_numeric($v)) && $where[] = [$k, '=', $v];
+            }
+            
+            $where = $this->getRightWhere($where);
+
+            $data = $this->model(){%with%}->where($where)->page($page)->field(true)->limit($limit)->select();
+
+            $count = $this->model()->where($where)->count('{%pk%}');
+
+            return $this->layuiJson($data, $count);
+        }
+        
+        $assign['buildTable']= {%buildTable%};
+        
+        return $this->assign($assign)->fetch();
+    }
+    
+    // 表单构建器
+    protected function buildForm()
+    {
+        $assign['buildForm'] = {%buildForm%};
+
+        $this->assign($assign);
+    }
+
+}

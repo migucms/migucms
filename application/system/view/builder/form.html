@@ -1,0 +1,202 @@
+{notempty name="$css"}
+    {foreach name="$css" id="vo"}
+        <link rel="stylesheet" href="{$vo}#hsv={:MIGU_VERSION}" />
+    {/foreach}
+{/notempty}
+{notempty name="$cssCode"}
+<style>
+    {$cssCode|raw}
+</style>
+{/notempty}
+
+{notempty name="$buildForm"}
+{php}
+    $editors = [];
+{/php}
+<form action="{:isset($buildForm['action']) ? $buildForm['action'] : url('', input('param.'))}" class="migu-form layui-form {:isset($buildForm['class']) ? $buildForm['class'] : ''}" method="{:isset($buildForm['method']) ? $buildForm['method'] : 'post'}" lay-filter="hsForm" {if (isset($buildForm['trigger']))}style="display:none;"{/if}>
+    <div class="layui-card" id="migu-card-head">
+        {if (isset($buildForm['group']))}
+        <div class="layui-tab layui-tab-brief">
+            <ul class="layui-tab-title">
+                {foreach name="$buildForm['group']" id="vo" key="formk"}
+                    <li class="{if ($formk === 0)}layui-this{/if}"><a href="javascript:;">{$vo['title']}</a></li>
+                {/foreach}
+            </ul>
+            <div class="layui-tab-content">
+                {foreach name="$buildForm['group']" id="form" key="formk"}
+                <div class="layui-tab-item {if ($formk === 0)}layui-show{/if}">
+                    <div class="layui-row">
+                        {include file="system@builder/form_item" /}
+                    </div>
+                </div>
+                {/foreach}
+            </div>
+        </div>
+        {else /}
+            <div style="padding:{$miguTabType ? 0 : '15px 0'};">
+                <div class="layui-row">
+                    {php}$form = $buildForm;{/php}
+                    {include file="system@builder/form_item" /}
+                </div>
+            </div>
+        {/if}
+    </div>
+        {if (isset($buildForm['footer']))}
+            {if ($buildForm['footer'])}
+                <div class="migu-footer">
+                    {$buildForm['footer']|raw}
+                </div>
+            {/if}
+        {else /}
+            <div class="migu-footer">
+                {php}
+                    $buildForm['submitBtn']['options']['url'] = $buildForm['submitBtn']['options']['url'] ?? input('server.HTTP_REFERER');
+                    $buildForm['submitBtn']['options']['pop'] = $buildForm['submitBtn']['options']['pop'] ?? input('get.migu_iframe', false);
+                {/php}
+                {if (isset($buildForm['ajax']) && !$buildForm['ajax'])}<button type="submit" class="layui-btn layui-btn-normal layui-btn-sm" lay-submit="">{$buildForm['submitBtn']['title'] ?? lang('submit save')}</button>{else /}<button type="submit" class="layui-btn layui-btn-sm" lay-submit="" migu-data='{:json_encode($buildForm['submitBtn']['options'], 1)}' lay-filter="formSubmit">{$buildForm['submitBtn']['title'] ?? lang('submit save')}</button>{/if}{if (isset($buildForm['resetBtn']))}<button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">{:lang('reset')}</button>{/if}{if (isset($buildForm['backBtn']))}<a href="{:is_string($buildForm['backBtn']) ? $buildForm['backBtn'] : url('index')}" class="layui-btn layui-btn-primary layui-btn-sm">{:lang('back')}</a>{/if}{if (isset($buildForm['cancelBtn']))}<a href="javascript:parent.layui.layer.closeAll();" class="layui-btn layui-btn-primary layui-btn-sm">{:lang('cancel')}</a>{/if}
+            </div>
+        {/if}
+    </div>
+    {if (isset($buildForm['token']) && $buildForm['token'])}{:token()}{/if}
+</form>
+{/notempty}
+{include file="system@block/layui" /}
+<script type="text/html" id="J_PhotoTpl">
+    <li>
+        <div class="img"><img src="{{ d.file }}" /></div>
+        <input type="hidden" name="{{ d.field }}[{{ d.index }}][path]" class="photo-{{ d.field }}-path" value="{{ d.file }}" />
+        <input type="hidden" name="{{ d.field }}[{{ d.index }}][desc]" class="photo-desc-input photo-{{ d.field }}-desc" value="{{ d.desc}}" />
+        <i class="layui-icon layui-icon-edit photo-desc-edit" data-field="{{ d.field }}" title="编辑图片描述"></i>
+        <i class="layui-icon layui-icon-delete migu-photo-delete" data-field="{{ d.field }}" title="删除图片" data-path="{{ d.file }}"></i>
+        <i class="layui-icon layui-icon-prev" data-field="{{ d.field }}" title="向前移动"></i>
+        <i class="layui-icon layui-icon-next" data-field="{{ d.field }}" title="向后移动"></i>
+    </li>
+</script>
+
+<script type="text/html" id="J_FilesTpl">
+    <li class="upload-item">
+        <input type="text" name="{{ d.field }}[{{ d.index }}][desc]" class="layui-input files-desc files-{{ d.field }}-desc" placeholder="文件标题" value="{{ d.desc }}" />
+        <input type="text" name="{{ d.field }}[{{ d.index }}][path]" class="layui-input files-path files-{{ d.field }}-path file-input" placeholder="请上传文件或输入文件链接" />
+        <button type="button" name="upload" class="layui-btn layui-btn-primary layui-upload" lay-type="files" lay-data="{{ d.laydata }}" id="files-{{ d.field }}-upload-btn{{ d.index }}"><i class="layui-icon layui-icon-upload"></i></button><a href="javascript:;" class="fa fa-minus-circle files-del" data-field="{{ d.field }}"></a><a href="javascript:;" class="fa fa-plus-circle files-add" data-field="{{ d.field }}"></a>
+    </li>
+</script>
+
+{notempty name="$tables"}
+    {foreach($tables as $k => $v)}
+        <script type="text/html" id="{$k}TableTpl">
+            {{# if (d.index) { }}
+                <tr>
+                    {foreach($v['cols'] as $kk => $vv)}
+                        <td>
+                            {switch($vv['type'])}
+                                {case select|radio}
+                                    <select name="{$k}[{{ d.index }}][{$vv['field']}]">
+                                        <option value="">请选择</option>
+                                        {foreach($vv['options'] as $kkk => $vvv)}
+                                        <option value="{$kkk}">{$vvv}</option>
+                                        {/foreach}
+                                    </select>
+                                {/case}
+                                {default /}
+                                    <input class="layui-input" name="{$k}[{{ d.index }}][{$vv['field']}]" value="{:isset($vv['value']) ? $vv['value'] : ''}" />
+                            {/switch}
+                        </td>
+                    {/foreach}
+                    <td>
+                        <a href="javascript:;" class="layui-btn layui-btn-xs layui-btn-danger migu-tr-del">删除</a>
+                    </td>
+                </tr>
+            {{# } else { }}
+                {{#  layui.each(d, function(index, item){ }}
+                <tr>
+                    {foreach($v['cols'] as $kk => $vv)}
+                        <td>
+                            {switch($vv['type'])}
+                                {case select|radio}
+                                    <select name="{$k}[{{ index }}][{$vv['field']}]">
+                                        <option value="">请选择</option>
+                                        {foreach($vv['options'] as $kkk => $vvv)}
+                                        <option value="{$kkk}" {{ (typeof(item.{$vv['field']}) != 'undefined' && item.{$vv['field']}.toString() == '{$kkk}') ? 'selected' : '' }}>{$vvv}</option>
+                                        {/foreach}
+                                    </select>
+                                {/case}
+                                {default /}
+                                    <input class="layui-input" name="{$k}[{{ index }}][{$vv['field']}]" value="{{ typeof(item.{$vv['field']}) != 'undefined' ? item.{$vv['field']} : '' }}" />
+                            {/switch}
+                        </td>
+                    {/foreach}
+                    <td>
+                        {if (isset($v['del_url']))} 
+                            <input type="hidden" name="{$k}[{{ index }}][id]" value="{{ item.id }}" />
+                            <a href="{$v['del_url']}?id={{ item.id || '0' }}" class="layui-btn layui-btn-xs layui-btn-danger migu-tr-del">删除</a>
+                        {else /}
+                            <a href="javascript:;" class="layui-btn layui-btn-xs layui-btn-danger migu-tr-del">删除</a>
+                        {/if}
+                    </td>
+                </tr>
+                {{#  }); }} 
+            {{# } }}
+        </script>
+    {/foreach}
+{/notempty}
+
+<script type="text/javascript">
+    var formData = {:json_encode($formData, 1)};
+    var formTrigger = {:json_encode($buildForm['trigger'] ?? [], 1)};
+    var formTable = {:json_encode($tables ?? [], 1)};
+</script>
+<script src="__ADMIN_JS__/form.js?v={:MIGU_VERSION}"></script>
+{notempty name="$js"}
+    {foreach name="$js" id="vo"}
+        <script src="{$vo}#hsv={:MIGU_VERSION}"></script>
+    {/foreach}
+{/notempty}
+{notempty name="$jsCode"}
+<script>
+    {$jsCode|raw}
+</script>
+{/notempty}
+
+{php}
+    /* 加载扩展编辑器 */
+    $defEditor = $ueditor = $umeditor = $ckeditor = $kindeditor = [];
+    foreach ($editors as $k => $v) {
+        switch($v) {
+            case 'ueditor':
+                $ueditor[] = 'editor-'.$k;
+                break;
+            case 'umeditor':
+                $umeditor[] = 'editor-'.$k;
+                break;
+            case 'ckeditor':
+                $ckeditor[] = 'editor-'.$k;
+                break;
+            case 'kindeditor':
+                $kindeditor[] = 'editor-'.$k;
+                break;
+            default:
+                $defEditor[] = 'editor-'.$k;
+                break;
+        }
+    }
+    
+    if (!empty($defEditor)) {
+        echo editor($defEditor);
+    }
+
+    if (!empty($ueditor)) {
+        echo editor($ueditor, 'ueditor');
+    }
+
+    if (!empty($umeditor)) {
+        echo editor($umeditor, 'umeditor');
+    }
+
+    if (!empty($ckeditor)) {
+        echo editor($ckeditor, 'ckeditor');
+    }
+
+    if (!empty($kindeditor)) {
+        echo editor($kindeditor, 'kindeditor');
+    }
+{/php}

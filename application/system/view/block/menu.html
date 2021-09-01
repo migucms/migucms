@@ -1,0 +1,197 @@
+<header class="migu-header">
+    <div class="migu-shrink">
+        <a href="javascript:;" class="layui-icon layui-icon-shrink-right" id="migu-side-shrink" title="侧边伸缩"></a>
+    </div>
+    <ul class="layui-nav hs-first-menu"></ul>
+    {if (cookie('migu_iframe') == 1)}
+    <div class="hs-menu-tabs">
+        <script type="text/html" id="hs-menus-tabs-tpl">
+            <span class="hs-tab-btn hs-tabs-action hs-tabs-prev" data-type="prev">
+                <i class="layui-icon layui-icon-prev"></i>
+            </span>
+            <span class="hs-tab-btn hs-tabs-action hs-tabs-next" data-type="next">
+                <i class="layui-icon layui-icon-next"></i>
+            </span>
+            <ul class="hs-tabs-menu"><li class="hs-tab-btn hs-tab-btn0 active hs-tab-home" data-id="0" data-type="page"><span class="layui-icon layui-icon-home"></span></li></ul>
+        </script>
+        <ul class="layui-nav hs-tabs-more">
+            <li class="layui-nav-item migu-tab-close-menu" style="display:none">
+                <a href="javascript:;"><i class="layui-icon layui-icon-down"></i></a>
+                <dl class="layui-nav-child">
+                    <dd><a href="javascript:;" class="hs-tabs-close" data-type="other">关闭其他标签</a></dd>
+                    <dd><a href="javascript:;" class="hs-tabs-close" data-type="all">关闭所有标签</a></dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+    {/if}
+    <ul class="layui-nav fr migu-header-nav">
+        <li class="layui-nav-item">
+            <a href="/" target="_blank" title="前台"><i class="layui-icon layui-icon-home"></i></a>
+        </li>
+        <li class="layui-nav-item">
+            <a href="javascript:;" title="清除缓存" id="migu-clear-cache"><i class="layui-icon layui-icon-delete"></i></a>
+        </li>
+        <li class="layui-nav-item">
+            <a  href="{:url('system/user/setTheme')}" id="migu-theme-setting" title="设置主题"><i class="layui-icon layui-icon-theme"></i></a>
+        </li>
+        <li class="layui-nav-item">
+            <a href="javascript:;" title="多语言"><i class="layui-icon layui-icon-website"></i></a>
+            <dl class="layui-nav-child">
+                {volist name="languages" id="vo"}
+                    {if condition="$vo['pack']"}
+                    <dd><a href="{:url('system/index/index')}?lang={$vo['code']}">{$vo['name']}</a></dd>
+                    {/if}
+                {/volist}
+                <dd><a class="hs-side-a" data-id="9999999" data-title="语言包" href="{:url('system/language/index')}">管理语言包</a></dd>
+            </dl>
+        </li>
+        <li class="layui-nav-item">
+            <a href="javascript:void(0);" class="nick">{$login['nick']}<i class="layui-icon layui-icon-triangle-d"></i></a>
+            <dl class="layui-nav-child">
+                <dd>
+                    <a href="javascript:;" id="migu-lock-screen">锁定屏幕</a>
+                </dd>
+                <dd>
+                    <a href="{:url('system/user/iframe')}" class="migu-ajax" refresh="true">{:input('cookie.migu_iframe') ? '单页模式' : '标签模式' }</a>
+                </dd>
+                <dd>
+                    <a href="{:url('system/user/menuLayout')}" title="菜单布局" class="migu-ajax" refresh="true">{:cookie('migu_menu_layout') ? '左侧菜单' : '分级菜单' }</a>
+                </dd>
+                <dd>
+                    <a class="migu-iframe" migu-data="{width: '450px', height: '492px'}" href="{:url('system/user/info')}">个人设置</a>
+                </dd>
+                <dd>
+                    <a href="{:url('system/publics/logout')}">退出登陆</a>
+                </dd>
+            </dl>
+        </li>
+    </ul>
+</header>
+
+{if (cookie('migu_menu_layout') == 1)}
+<aside class="migu-side">
+    <div class="layui-side-scroll" id="migu-side-menu">
+        <div class="migu-logo">
+            {if (config('mgcms.logo'))}
+                <img src="{:config('mgcms.logo')}" />
+            {else /}
+                <h1>{:config('mgcms.name')}</h1>
+            {/if}
+        </div>
+    </div>
+</aside>
+<script type="text/html" id="migu-side-menu-tpl" title="二级菜单">
+    {{# var sideMenuRender = function(data, level) { }} 
+        {{# layui.each(data, function(index, item) { }}
+            <dd class="layui-nav-item">
+            {{# if (item.childs) { }}
+                <a href="javascript:;" style="padding-left:{{ 28 + (15 * level) }}px;"><i class="{{ item.icon ? item.icon : 'layui-icon layui-icon-right' }}"></i>{{ item.title }}<span class="layui-nav-more"></span></a>
+                <dl class="layui-nav-child">
+                    {{# sideMenuRender(item.childs, level + 1) }}
+                </dl>
+            {{# } else { }}
+                <a class="hs-side-a" style="padding-left:{{ 28 + (15 * level) }}px;" data-title="{{ item.title }}" data-id="{{ item.id }}" href="{{# if (item.url) { }}{{ HSROOT + '/' + item.url.replace(/([A-Z])/g,"_$1").toLowerCase() }}.html{{ item.param ? '?'+item.param : '' }}{{# } }}"><i class="{{ item.icon ? item.icon : 'layui-icon layui-icon-right' }}"></i>{{ item.title }}</a>
+            {{# }; }}
+            </dd>
+        {{# }); }}
+    {{# } }}
+    {{# layui.each(d, function(i, v) { }}
+        <ul class="layui-nav layui-nav-tree side-menu-layout" id="migu-tree-menu{{ v.id }}" data-id="{{ v.id }}" title="{{ v.title }}" style="display:{{ i > 0 ? 'none' : 'block'}}">
+            {{# if (i == 0) { }}<li class="layui-nav-item"><a class="hs-side-a" data-title="后台首页" data-id="0" href="{:input('cookie.migu_iframe') ? url('system/index/welcome') : url('system/index/index')}"><i class="layui-icon layui-icon-home"></i>后台首页</a></li>{{# } }}
+            {{# if (v.childs) { }}
+                {{# layui.each(v.childs, function(ii, vv) { }}
+                <li class="layui-nav-item {{ i == 0 && ii == 0 ? 'layui-nav-itemed' : ''}}">
+                    {{# if (vv.childs) { }}
+                        <a href="javascript:;"><i class="{{ vv.icon ? vv.icon : 'layui-icon layui-icon-right' }}"></i>{{ vv.title }}<span class="layui-nav-more"></span></a>
+                        <dl class="layui-nav-child">
+                            {{# sideMenuRender(vv.childs, 1) }}
+                        </dl>
+                    {{# } else { }}
+                        <a class="hs-side-a" data-title="{{ vv.title }}" data-id="{{ vv.id }}" href="{{# if (vv.url) { }}{{ HSROOT + '/' + vv.url.replace(/([A-Z])/g,"_$1").toLowerCase() }}.html{{ vv.param ? '?'+vv.param : '' }}{{# } }}"><i class="{{ vv.icon ? vv.icon : 'layui-icon layui-icon-right' }}"></i>{{ vv.title }}</a>
+                    {{# }; }}
+                </li>
+                {{# }); }}
+            {{# } else { }}
+                <li class="layui-nav-item">
+                    <a class="hs-side-a" data-title="{{ v.title }}" data-id="{{ v.id }}" href="{{# if (v.url) { }}{{ HSROOT + '/' + v.url.replace(/([A-Z])/g,"_$1").toLowerCase() }}.html{{ v.param ? '?'+v.param : '' }}{{# } }}"><i class="{{ v.icon ? v.icon : 'layui-icon layui-icon-right' }}"></i>{{ v.title }}</a>
+                </li>
+            {{# }; }}
+        </ul>
+    {{# }); }}
+    <li class="layui-nav-item">&nbsp;<li>
+</script>
+{else /}
+<aside class="migu-side">
+    <div class="layui-side-scroll">
+        <div class="migu-logo">
+            {if (config('mgcms.logo'))}
+                <img src="{:config('mgcms.logo')}" />
+            {else /}
+                <h1>{:config('mgcms.name')}</h1>
+            {/if}
+        </div>
+        <ul class="layui-nav layui-nav-tree" id="migu-side-menu">
+            <li class="layui-nav-item">
+                <a class="hs-side-a" data-title="后台首页" data-id="0" href="{:input('cookie.migu_iframe') ? url('system/index/welcome') : url('system/index/index')}"><i class="layui-icon layui-icon-home"></i>后台首页</a>
+            </li>
+        </ul>
+    </div>
+</aside>
+<script type="text/html" id="migu-side-menu-tpl" title="一级菜单">
+    {{# var sideMenuRender = function(data, level) { }} 
+        {{# layui.each(data, function(index, item) { }}
+            <dd class="layui-nav-item">
+            {{# if (item.childs) { }}
+                <a href="javascript:;" style="padding-left:{{ 28 + (15 * level) }}px;"><i class="{{ item.icon ? item.icon : 'layui-icon layui-icon-right' }}"></i>{{ item.title }}<span class="layui-nav-more"></span></a>
+                <dl class="layui-nav-child">
+                    {{# sideMenuRender(item.childs, level + 1) }}
+                </dl>
+            {{# } else { }}
+                <a class="hs-side-a" style="padding-left:{{ 28 + (15 * level) }}px;" data-title="{{ item.title }}" data-id="{{ item.id }}" href="{{# if (item.url) { }}{{ HSROOT + '/' + item.url.replace(/([A-Z])/g,"_$1").toLowerCase() }}.html{{ item.param ? '?'+item.param : '' }}{{# } }}"><i class="{{ item.icon ? item.icon : 'layui-icon layui-icon-right' }}"></i>{{ item.title }}</a>
+            {{# }; }}
+            </dd>
+        {{# }); }}
+    {{# } }}
+    {{# layui.each(d, function(index, item) { }}
+        <li class="layui-nav-item">
+            {{# if (item.childs) { }}
+                <a href="javascript:;"><i class="{{ item.icon ? item.icon : 'layui-icon layui-icon-right' }}"></i>{{ item.title }}<span class="layui-nav-more"></span></a>
+                <dl class="layui-nav-child">
+                    {{# sideMenuRender(item.childs, 1) }}
+                </dl>
+            {{# } else { }}
+                <a class="hs-side-a" data-title="{{ item.title }}" data-id="{{ item.id }}" href="{{# if (item.url) { }}{{ HSROOT + '/' + item.url.replace(/([A-Z])/g,"_$1").toLowerCase() }}.html{{ item.param ? '?'+item.param : '' }}{{# } }}"><i class="{{ item.icon ? item.icon : 'layui-icon layui-icon-right' }}"></i>{{ item.title }}</a>
+            {{# }; }}
+        </li>
+    {{# }); }}
+    <li class="layui-nav-item">&nbsp;<li>
+</script>
+{/if}
+<script type="text/html" id="migu-clear-cache-tpl">
+    <form class="layui-form" style="padding:10px 0 0 30px;" action="{:url('system/index/clear')}" method="post">
+        <div class="layui-form-item">
+            <input type="checkbox" name="cache" value="1" title="数据缓存" />
+        </div>
+        <div class="layui-form-item">
+            <input type="checkbox" name="log" value="1" title="日志缓存" />
+        </div>
+        <div class="layui-form-item">
+            <input type="checkbox" name="temp" value="1" title="模板缓存" />
+        </div>
+        <div class="layui-form-item">
+            <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="formSubmit">执行删除</button>
+        </div>
+    </form>
+</script>
+<script type="text/html" id="migu-theme-tpl">
+    <ul class="migu-themes">
+        {foreach name=":session('migu_admin_themes')" id="v"}
+        <li data-theme="{$v}" class="migu-theme-{$v}">
+            <div class="lt"></div>
+            <div class="h"></div>
+            <div class="l"></div>
+        </li>
+        {/foreach}
+    </ul>
+</script>

@@ -1,0 +1,109 @@
+{notempty name="$css"}
+    {foreach name="$css" id="vo"}
+        <link rel="stylesheet" href="{$vo}#hsv={:MIGU_VERSION}" />
+    {/foreach}
+{/notempty}
+{notempty name="$cssCode"}
+<style>
+    {$cssCode|raw}
+</style>
+{/notempty}
+
+<div style="padding:{if (!isset($buildTreeTable['config']['toolbar']) && !isset($buildTreeTable['toolbar']) && !isset($buildTreeTable['config']['defaultToolbar'])) /}10px{else /}0{/if} {$miguTabType ? 0 : 10}px 10px;">
+    {notempty name="$buildTreeTable['toolbar']"}
+    <div class="layui-table-tool" style="min-height:auto;">
+        <div class="layui-table-tool-temp">
+            <ul class="migu-toolbar-nav">
+                {volist name="$buildTreeTable['toolbar']" id="vo"}
+                <li>
+                    {if (isset($vo['childs']))}
+                        <a href="javascript:;" class="layui-btn layui-btn-sm layui-btn-primary">{$vo['title']}</a>
+                        <dl>
+                            {volist name="$vo['childs']" id="vv"}
+                            <dd>
+                                <a href="{:isset($vv['url']) ? (stripos($vv['url'], config('sys.admin_path')) != false ? $vv['url'] : url($vv['url'])) : 'javascript:;'}" class="{:isset($vv['class']) ? $vv['class'] : ''}" {if (isset($vv['options'])) /}migu-data='{:json_encode($vv['options'], 1)}'{/if}>{$vv['title']|raw}</a>
+                            </dd>
+                            {/volist} 
+                        </dl> 
+                    {else /} 
+                        <a href="{:isset($vo['url']) ? (stripos($vo['url'], config('sys.admin_path')) != false ? $vo['url'] : url($vo['url'])) : 'javascript:;'}" {if (isset($vo['options'])) /}migu-data='{:json_encode($vo['options'], 1)}'{/if} class="layui-btn layui-btn-sm {:isset($vo['class']) ? $vo['class'] : ''}">{$vo['title']}</a>
+                    {/if}
+                </li>
+                {/volist}
+                {if (isset($buildTreeTable['config']['data']))}
+                    <li>
+                        <button id="migu-toggle-tree" style="font-size:12px;" class="layui-btn layui-btn-primary layui-btn-sm fa fa-plus"> 显示所有</button>
+                    </li>
+                {/if}
+            </ul>
+        </div>
+    </div>
+    {/notempty}
+    <table id="dataTable"></table>
+</div>
+{notempty name="$buildTreeTable['config']['cols']"}
+    {foreach name="$buildTreeTable['config']['cols']" id="v"}
+        {if (isset($v['type']) && $v['type'] == 'switch')}
+            {php}$buildTreeTable['config']['cols'][$key]['templet'] = '#'.$v['field'].'SwitchTpl';{/php}
+            <script type="text/html" id="{$v['field']}SwitchTpl">
+                <input type="checkbox" name="status" value="{{ d.{$v['field']} }}" lay-skin="switch" lay-filter="switchStatus" lay-text="{:isset($v['text']) ? $v['text'] : ''}" {{ d.{$v['field']} == 1 ? 'checked' : '' }} data-href="{if (isset($v['url']))}{:stripos($v['url'], config('sys.admin_path')) != false ? $v['url'] : url($v['url'])}?id={{ d.id }}{else /}{:url('status')}?field={$v['field']}&id={{ d.id }}{/if}{:isset($v['param']) ? '&'.urldecode(http_build_query($v['param'])) : ''}">
+            </script>
+        {elseif (isset($v['button'])) /}
+            {php}$buildTreeTable['config']['cols'][$key]['templet'] = '#buttonTpl'.$key;{/php}
+            <script type="text/html" id="buttonTpl{$key}">
+                {foreach name="$v['button']" id="vv"}<a href="{if (isset($vv['url']) && $vv['url'])}{:stripos($vv['url'], config('sys.admin_path')) != false ? $vv['url'] : url($vv['url'])}?id={{ d.id }}{:isset($vv['param']) ? '&'.urldecode(http_build_query($vv['param'])) : ''}{else /}javascript:;{/if}" class="{:isset($vv['class']) ? $vv['class'] : ''}" {if (isset($vv['options'])) /}migu-data='{:json_encode($vv['options'], 1)}'{/if}>{$vv['title']|raw}</a> {/foreach}
+            </script>
+        {/if}
+    {/foreach}
+{/notempty}
+
+{include file="system@block/layui" /}
+<script type="text/javascript">
+    var miguTable = {}, miguTableIns = {};
+    layui.extend({treeTable: 'treeTable/treeTable'}).use(['jquery', 'func', 'treeTable', 'layer'], function() {
+        var $ = layui.jquery, func = layui.func, layer = layui.layer;
+        miguTable = layui.treeTable;
+        var options = func.jsonParse({:json_encode($buildTreeTable['config'], 1)});
+        options.elem = '#dataTable';
+        
+        {if (!isset($buildTreeTable['config']['data']))}
+            options.reqData = function(data, callback) {
+                $.get(options.url || "{:isset($pluginsName) ? plugins_url('', input('param.')) : url('', input('param.'))}", data, function (res) {
+                    callback(res.data);
+                });
+            };
+        {/if}
+        
+        miguTableIns = miguTable.render(options);
+
+        $('#migu-toggle-tree').on('click', function() {
+            var t = $(this);
+            if (t.hasClass('fa-plus')) {
+                t.removeClass('fa-plus').addClass('fa-minus').text(" 隐藏所有");
+                miguTableIns.expandAll();
+            } else {
+                t.removeClass('fa-minus').addClass('fa-plus').text(" 显示所有");
+                miguTableIns.foldAll();
+            }
+        })        
+        miguTable.on("edit(dataTable)", function (o) {
+            $.post("{:input('param._p') ? plugins_url('setField') : url('setField')}", {
+                id: o.data['id'],
+                field: o.field,
+                value: o.value,
+            }, function (res) {
+                0 == res.code && layer.msg(res.msg)
+            }, "json")
+        })
+    });
+</script>
+{notempty name="$js"}
+{foreach name="$js" id="vo"}
+    <script src="{$vo}#hsv={:MIGU_VERSION}"></script>
+{/foreach}
+{/notempty}
+{notempty name="$jsCode"}
+<script>
+{$jsCode|raw}
+</script>
+{/notempty}

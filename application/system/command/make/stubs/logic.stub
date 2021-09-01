@@ -1,0 +1,10 @@
+<?php
+
+namespace {%namespace%};
+
+use app\common\logic\Base;
+
+class {%className%} extends Base
+{
+    
+}

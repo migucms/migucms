@@ -1,0 +1,126 @@
+{notempty name="$css"}
+    {foreach name="$css" id="vo"}
+        <link rel="stylesheet" href="{$vo}#hsv={:MIGU_VERSION}" />
+    {/foreach}
+{/notempty}
+{notempty name="$cssCode"}
+<style>
+    {$cssCode|raw}
+</style>
+{/notempty}
+
+<div style="padding:{if (!isset($buildTable['config']['toolbar']) && !isset($buildTable['toolbar']) && !isset($buildTable['config']['defaultToolbar'])) /}10px{else /}0{/if} {$miguTabType ? 0 : 10}px 10px;">
+{notempty name="$buildTable['filter']"}
+{include file="system@builder/table_filter" /}
+{php}
+
+if (isset($buildTable['config']['defaultToolbar'])) {
+    array_unshift($buildTable['config']['defaultToolbar'], ['title' => '搜索', 'icon' => 'layui-icon-search', 'layEvent' => 'MIGUTABLE_SEARCH']);
+} else {
+    $buildTable['config']['defaultToolbar'][] = ['title' => '搜索', 'icon' => 'layui-icon-search', 'layEvent' => 'MIGUTABLE_SEARCH'];
+}
+
+$buildTable['config']['defaultToolbar'][] = ['title' => '刷新页面', 'icon' => 'layui-icon-refresh', 'layEvent' => 'MIGUTABLE_REFRESH'];
+{/php}
+{/notempty}
+
+<table id="dataTable" lay-filter="dataTable"></table>
+</div>
+{notempty name="$buildTable['toolbar']"}
+<script type="text/html" id="toolbar">
+    <ul class="migu-toolbar-nav">
+        {volist name="$buildTable['toolbar']" id="vo"}
+        <li>{if (isset($vo['childs']))}
+                <a href="javascript:;" class="layui-btn layui-btn-sm layui-btn-primary">{$vo['title']}</a>
+                <dl>
+                    {volist name="$vo['childs']" id="vv"}
+                        <dd>
+                            <a href="{:isset($vv['url']) ? (stripos($vv['url'], config('sys.admin_path')) != false ? $vv['url'] : url($vv['url'])) : 'javascript:;'}" class="{:isset($vv['class']) ? $vv['class'] : ''}" {if (isset($vv['options'])) /}migu-data='{:json_encode($vv['options'], 1)}'{/if} {if isset($vv['data-table_id'])}data-table_id="{$vv['data-table_id']}"{/if}>{$vv['title']}</a>
+                        </dd>
+                    {/volist}
+                </dl>
+            {else /}
+                <a href="{:isset($vo['url']) ? (stripos($vo['url'], config('sys.admin_path')) != false ? $vo['url'] : url($vo['url'])) : 'javascript:;'}" {if (isset($vo['options'])) /}migu-data='{:json_encode($vo['options'], 1)}'{/if} class="layui-btn layui-btn-sm {:isset($vo['class']) ? $vo['class'] : ''}" {if isset($vo['data-table_id'])}data-table_id="{$vo['data-table_id']}"{/if}>{$vo['title']}</a>
+            {/if}</li>
+        {/volist}
+    </ul>
+</script>
+{/notempty}
+{notempty name="$buildTable['config']['cols']"}
+    {foreach name="$buildTable['config']['cols']" id="v"}
+        {if (isset($v['type']) && $v['type'] == 'switch')}
+            {php}$buildTable['config']['cols'][$key]['templet'] = '#'.$v['field'].'SwitchTpl';{/php}
+            <script type="text/html" id="{$v['field']}SwitchTpl">
+                <input type="checkbox" name="status" value="{{ d.{$v['field']} }}" lay-skin="switch" lay-filter="switchStatus" lay-text="{:isset($v['text']) ? $v['text'] : ''}" {{ d.{$v['field']} == 1 ? 'checked' : '' }} data-href="{if (isset($v['url']))}{:stripos($v['url'], config('sys.admin_path')) != false ? $v['url'] : url($v['url'])}?id={{ d.id }}{else /}{:url('status')}?field={$v['field']}&id={{ d.id }}{/if}{:isset($v['param']) ? '&'.urldecode(http_build_query($v['param'])) : ''}">
+            </script>
+        {elseif (isset($v['button'])) /}
+            {php}$buildTable['config']['cols'][$key]['templet'] = '#buttonTpl'.$key;{/php}
+            <script type="text/html" id="buttonTpl{$key}">
+                {foreach name="$v['button']" id="vv"}<a href="{if (isset($vv['url']) && $vv['url'])}{:stripos($vv['url'], config('sys.admin_path')) != false ? $vv['url'] : url($vv['url'])}?id={{ d.id }}{:isset($vv['param']) ? '&'.urldecode(http_build_query($vv['param'])) : ''}{else /}javascript:;{/if}" class="{:isset($vv['class']) ? $vv['class'] : ''}" {if (isset($vv['options'])) /}migu-data='{:json_encode($vv['options'], 1)}'{/if}>{$vv['title']|raw}</a> {/foreach}
+            </script>
+        {/if}
+    {/foreach}
+{/notempty}
+
+{include file="system@block/layui" /}
+<script type="text/javascript">
+
+    var miguTable = {}, miguTableIns = {};
+    layui.use(['table', 'jquery', 'global', 'func'], function() {
+        var  $ = layui.jquery, 
+            func = layui.func,
+            toolbars = {},
+            options = func.jsonParse({:json_encode($buildTable['config'], 1)});
+        
+            miguTable = layui.table;
+        options.elem = '#dataTable';
+        {if (!isset($buildTable['config']['data']))}
+            options.url = options.url || "{:url('', input('param.'))}";
+        {/if}
+        {if (isset($buildTable['config']['toolbar']))}
+            options.toolbar = "{$buildTable['config']['toolbar']|raw}";
+        {elseif (isset($buildTable['toolbar']) || isset($buildTable['config']['defaultToolbar'])) /}
+            options.toolbar = '#toolbar';
+        {/if}
+        options.defaultToolbar = options.defaultToolbar || [];
+
+        layui.each(options.defaultToolbar, function(k, v) {
+            if (typeof(v) == 'object') {
+                if (v.name && v.name == 'export') {
+                    v.layEvent = 'MIGUTABLE_EXPORT';
+                    v.title = '导出';
+                    v.icon = 'layui-icon-export';
+                    options.defaultToolbar[k] = v;
+                }
+                toolbars[v.layEvent] = v;
+            } else if (v === 'export') {
+                options.defaultToolbar[k] = {title: '导出', icon: 'layui-icon-export', layEvent: 'MIGUTABLE_EXPORT'};
+            }
+        });
+
+        options.done = function() {
+            localStorage.setItem(location.pathname+'_limit', this.limit);
+            {if (isset($buildTable['config']['done']))}{$buildTable['config']['done']|raw}{/if}
+        };
+
+        if (localStorage.getItem(location.pathname+'_limit')) {
+            options.limit = localStorage.getItem(location.pathname+'_limit');
+        }
+        
+        options.cols = [options.cols];
+        miguTableIns = miguTable.render(options);
+        layui.global.tableEdit.init({:json_encode(['url' => input('param._p') ? plugins_url('setField') : url('setField')], 1)});
+        layui.global.tableTool(miguTable, toolbars);
+    });
+</script>
+<script src="__ADMIN_JS__/form.js?v={:MIGU_VERSION}"></script>
+{notempty name="$js"}
+{foreach name="$js" id="vo"}
+    <script src="{$vo}#hsv={:MIGU_VERSION}"></script>
+{/foreach}
+{/notempty}
+{notempty name="$jsCode"}
+<script>
+{$jsCode|raw}
+</script>
+{/notempty}

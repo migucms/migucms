@@ -1,0 +1,18 @@
+{
+    "name": "wxkxklmyt/pscws4",
+    "description": "基于PSCWS4的中文分词工具",
+    "authors": [
+        {
+            "name": "我的梦",
+            "email": "519468341@qq.com"
+        }
+    ],
+    "require": {
+		"php": ">=5.4.0"
+	},
+	"autoload": {
+        "psr-4": {
+            "wxkxklmyt\\": "src/"
+        }
+    }
+}

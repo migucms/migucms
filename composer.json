@@ -1,0 +1,42 @@
+{
+    "name": "mgcms/mgcms",
+    "description": "the mgcms admin framework",
+    "type": "project",
+    "keywords": [
+        "mgcms",
+        "framework",
+        "thinkphp",
+        "ORM"
+    ],
+    "homepage": "http://www.migucms.com/",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "mgcms",
+            "email": "364666827@qq.com",
+            "homepage": "http://www.migucms.com",
+            "role": "Creator"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.0",
+        "topthink/framework": "5.1.*",
+        "topthink/think-captcha": "^2.0",
+        "topthink/think-image": "^1.0",
+        "topthink/think-helper": "^1.0",
+        "psr/log": "^1.1",
+        "guzzlehttp/guzzle": "6.*",
+        "wxkxklmyt/pscws4": "^0.0.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "app\\": "application"
+        }
+    },
+    "extra": {
+        "think-path": "thinkphp"
+    },
+    "config": {
+        "preferred-install": "dist"
+    }
+}

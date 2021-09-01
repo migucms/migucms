@@ -1,0 +1,11 @@
+
+    public function set{%fieldName%}Attr($value)
+    {
+        return implode(',', $value);
+    }
+    
+    public function get{%fieldName%}Attr($value)
+    {
+        return explode(',', $value);
+    }
+    

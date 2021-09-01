@@ -1,0 +1,13 @@
+<?php
+namespace {%namespace%}\service;
+
+use app\common\service\Base;
+
+/**
+ * {%classTitle%}服务
+ * @package {%namespace%}\service
+ */
+class {%className%} extends Base
+{
+    
+}

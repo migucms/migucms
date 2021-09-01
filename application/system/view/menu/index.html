@@ -1,0 +1,95 @@
+<style type="text/css">
+    .layui-table-body{overflow:hidden;}
+    .migu-tr-tree-btn{cursor:pointer;}
+</style>
+
+<table id="dataTable" lay-filter="dataTable"></table>
+
+{include file="block/layui" /}
+
+<script type="text/html" id="toolbar">
+    <div class="migu-table-tool">
+        <!-- <a href="{:url('add')}" class="layui-btn layui-btn-normal layui-btn-sm migu-iframe">添加菜单</a> -->
+    </div>
+</script>
+
+<script type="text/html" id="switchTpl">
+    <input type="checkbox" name="status" value="{{ d.status }}" lay-skin="switch" lay-filter="switchStatus" lay-text="启用|禁用" {{ d.status == 1 ? 'checked' : '' }} data-href="{:url('status')}?id={{ d.id }}">
+</script>
+
+<script type="text/html" title="排序模板" id="sortTpl">
+    <input type="text" class="migu-ajax-input input-sort" onkeyup="value=value.replace(/[^\d]/g,'')" value="{{ d.sort }}" data-value="{{ d.sort }}" data-href="{:url('sort')}?id={{ d.id }}">
+</script>
+
+<script type="text/html" id="buttonTpl">
+    <a href="{:url('add')}?pid={{ d.id }}&mod={{ d.module }}" class="layui-btn layui-btn-xs layui-btn-normal layui-icon layui-icon-add-1 migu-iframe" title="添加菜单"></a><a href="{:url("edit")}?id={{ d.id }}&mod={{ d.module }}" class="layui-btn layui-btn-xs layui-btn-normal migu-iframe layui-icon layui-icon-edit" title="修改菜单"></a><a href="{:url("del")}?id={{d.id}}" class="j-tr-del layui-btn layui-btn-xs layui-btn-danger layui-icon layui-icon-delete" title="删除"></a>
+</script>
+
+<script type="text/html" id="migu-tr-tpl">
+    {{# layui.each(d.data, function(index, item) { }}
+    <tr class="{{ d.class }}">
+        <td>
+            <div class="layui-table-cell laytable-cell-1-0-0" style="padding-left: {{ d.level * 15  }}px">
+                {{# if (item.childs) { }}
+                    <i class="migu-tr-tree-btn layui-icon layui-icon-triangle-r" data-class="{{ d.class +' tr-index-'+ item.id }}" data-level="{{ d.level }}" data-childs='{{ JSON.stringify(item.childs) }}' data-pid="{{ item.id }}">{{ item.title }}</i>
+                {{# } else { }}
+                    {{ item.title }}
+                {{# } }}
+            </div>
+        </td>
+        <td>
+            <div class="layui-table-cell laytable-cell-1-0-1"><i class="{{ item.icon }}"></i></div>
+        </td>
+        <td>
+            <div class="layui-table-cell laytable-cell-1-0-2">{{ item.url }}</div>
+        </td>
+        <td>
+            <div class="layui-table-cell laytable-cell-1-0-3">
+                <input type="text" class="migu-ajax-input input-sort" onkeyup="value=value.replace(/[^\d]/g,'')" value="{{ item.sort }}" data-value="{{ item.sort }}" data-href="{:url('sort')}?id={{ item.id }}">
+            </div>
+        </td>
+        <td>
+            <div class="layui-table-cell laytable-cell-1-0-4">
+                <input type="checkbox" name="status" value="{{ item.status }}" lay-skin="switch" lay-filter="switchStatus" lay-text="启用|禁用" {{ item.status == 1 ? 'checked' : '' }} data-href="{:url('status')}?id={{ item.id }}">
+            </div>
+        </td>
+        <td>
+            <div class="layui-table-cell laytable-cell-1-0-5">
+                <a href="{:url('add')}?pid={{ item.id }}&mod={{ item.module }}" class="layui-btn layui-btn-xs layui-btn-normal layui-icon layui-icon-add-1 migu-iframe" title="添加菜单"></a><a href="{:url("edit")}?id={{ item.id }}&mod={{ item.module }}" class="layui-btn layui-btn-xs layui-btn-normal layui-icon layui-icon-edit migu-iframe" title="修改菜单"></a><a href="{:url("del")}?id={{ item.id }}" class="j-tr-del layui-btn layui-btn-xs layui-btn-danger layui-icon layui-icon-delete" title="删除"></a>
+            </div>
+        </td>
+    </tr>
+    {{# }); }}
+</script>
+
+<script type="text/javascript">
+    layui.use(['table', 'jquery', 'laytpl', 'global'], function(e) {
+        var $ = layui.jquery, table = layui.table, laytpl = layui.laytpl, form = layui.form;
+            
+        table.render({
+            elem: '#dataTable'
+            ,data: {:json_encode($menus)}
+            ,limit: 200
+            ,text: {
+                none: '暂无相关数据'
+            }
+            ,cols: [[ //表头
+                {field: 'title', title: '菜单标题', templet: function(d) {
+                    if (d.childs) {
+                        return '<span class="migu-tr-tree-btn layui-icon layui-icon-triangle-r" data-class="tr-index-'+d.id+'" data-level="1" data-childs=\''+JSON.stringify(d.childs)+'\' data-pid="'+d.id+'">'+d.title+'</span>';
+                    } else {
+                        return d.title;
+                    }
+                }}
+            	,{field: 'icon', title: '图标', width: 60, templet: '<div><i class="{{ d.icon }}"></i></div>'}
+            	,{field: 'url', title: '菜单节点', width: 150, templet: '<div>{{ d.url }}</div>'}
+            	,{field: 'sort', title: '排序', width: 70, templet: '#sortTpl'}
+                ,{field: 'status', title: '状态', templet:'#switchTpl', width: 95}
+                ,{title: '操作', templet: '#buttonTpl', width: 140}
+            ]],
+            done: function() {
+                layui.global.tableTree.init();
+            }
+        });
+    });
+</script>

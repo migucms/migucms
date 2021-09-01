@@ -1,0 +1,108 @@
+<style>
+.hs-icon-input{position: relative;z-index: 1;}
+.hs-icon-input i{position:absolute;z-index: 2;left:1px;top:1px;width:36px;height:36px;line-height:36px;background-color:#f2f2f2;text-align:center;border-right:1px solid #e6e6e6;font-size:20px;}
+.hs-icon-input input{text-indent:40px;}
+</style>
+<form class="layui-form ptb15" action="{:url()}" method="post" id="editForm">
+    <div class="layui-form-item">
+        <label class="layui-form-label">所属菜单</label>
+        <div class="layui-input-inline">
+            <select name="pid" class="field-pid" type="select" lay-filter="pid">
+                <option value="0" level="0">顶级菜单</option>
+                {$menuOptions|raw}
+            </select>
+        </div>
+        <div class="layui-form-mid layui-word-aux">建议选择同一模块的菜单</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">菜单名称</label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input field-title" name="title" lay-verify="required" autocomplete="off" placeholder="请输入菜单名称">
+        </div>
+        <div class="layui-form-mid layui-word-aux">长度限制3-24个字节</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">图标设置</label>
+        <div class="layui-input-inline hs-icon-input">
+            <i class="{if (isset($formData['icon']))}{$formData['icon']}{/if}" id="form-icon-preview"></i>
+            <input type="text" class="layui-input field-icon" id="input-icon" name="icon" lay-verify="" autocomplete="off" placeholder="样式名/图标地址">
+        </div>
+        <div class="layui-form-mid layui-word-aux"><a href="{:url('publics/icon?input=input-icon&show=form-icon-preview')}" title="选择图标" class="layui-btn layui-btn-normal layui-btn-xs migu-iframe-pop">选择图标</a> 可直接填写图标URL</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">菜单链接</label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input field-url" name="url" lay-verify="required" autocomplete="off" placeholder="模块名/控制器名/方法名">
+        </div>
+        <div class="layui-form-mid layui-word-aux"><span class="red">请留意大小写</span>，插件固定：system/plugins/run</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">扩展参数</label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input field-param" name="param" lay-verify="" autocomplete="off" placeholder="示例：a=123&b=345">
+        </div>
+        <div class="layui-form-mid layui-word-aux">
+            选填， 插件格式：_p=插件名称&_c=插件控制器&_a=插件方法
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序设置</label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input field-sort" name="sort" lay-verify="number" autocomplete="off" value="0" />
+        </div>
+        <div class="layui-form-mid layui-word-aux"></div>
+    </div>
+    <!-- <div class="layui-form-item">
+        <label class="layui-form-label">数据权限</label>
+        <div class="layui-input-inline">
+            <select name="data_right" class="field-data_right">
+                <option value="0">不启用</option>
+                <option value="org">组织</option>
+                <option value="own">个人</option>
+            </select>
+        </div>
+        <div class="layui-form-mid layui-word-aux">组织：按角色管理数据，个人：只能管理自己的数据</div>
+    </div> -->
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态设置</label>
+        <div class="layui-input-inline">
+            <input type="radio" class="field-status" name="status" value="1" title="启用" checked>
+            <input type="radio" class="field-status" name="status" value="0" title="禁用">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">系统菜单</label>
+        <div class="layui-input-inline">
+            <input type="radio" class="field-system" name="system" value="1" title="是">
+            <input type="radio" class="field-system" name="system" value="0" title="否" checked>
+        </div>
+        <div class="layui-form-mid layui-word-aux">系统菜单无法删除</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">开发可见</label>
+        <div class="layui-input-inline">
+            <input type="radio" class="field-debug" name="debug" value="1" title="是">
+            <input type="radio" class="field-debug" name="debug" value="0" title="否" checked>
+        </div>
+        <div class="layui-form-mid layui-word-aux">开发模式可见</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">后台导航</label>
+        <div class="layui-input-inline">
+            <input type="radio" class="field-nav" name="nav" value="1" title="是" checked>
+            <input type="radio" class="field-nav" name="nav" value="0" title="否">
+        </div>
+    </div>
+    <div class="migu-footer">
+        <input type="hidden" class="field-id" name="id">
+        <input type="hidden" name="module" value="{:input('param.mod', 'system')}">
+        <button type="submit" class="layui-btn layui-btn-sm" migu-data='{pop: true}' lay-submit="" lay-filter="formSubmit">{:lang('submit save')}</button>
+        <a href="javascript:parent.layui.layer.closeAll();" class="layui-btn layui-btn-sm layui-btn-primary ml10">{:lang('cancel')}</a>
+    </div>
+</form>
+{include file="block/layui" /}
+<script>
+layui.use(['func'], function() {
+    layui.func.assign({:json_encode($formData)});
+});
+</script>

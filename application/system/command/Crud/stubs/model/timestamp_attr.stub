@@ -1,0 +1,11 @@
+
+    public function set{%fieldName%}Attr($value)
+    {
+        return is_numeric($value) ? $value : strtotime($value);
+    }
+    
+    public function get{%fieldName%}Attr($value)
+    {
+        return is_numeric($value) ? date('{%format%}', $value) : $value;
+    }
+    

@@ -1,0 +1,13 @@
+<?php
+namespace {%namespace%}\validate;
+
+use app\common\validate\Base;
+
+/**
+ * {%classTitle%}验证器
+ * @package {%namespace%}\validate
+ */
+class {%className%} extends Base
+{
+    
+}

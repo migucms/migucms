@@ -1,0 +1,13 @@
+<?php
+
+namespace {%namespace%};
+
+use app\common\controller\Common;
+
+class {%className%} extends Common
+{
+    public function index()
+    {
+        
+    }
+}

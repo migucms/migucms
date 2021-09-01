@@ -1,0 +1,10 @@
+<!--表单项扩展，此文件升级不会被覆盖-->
+{case demo}
+    <div class="layui-form-item" id="hs-item-{$hsv['name']}">
+        <label class="layui-form-label">{$hsv['title']|raw}</label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input field-{$hsv['name']}" value="{$hsv['value']}" />
+        </div>
+        {if (isset($hsv['tips']))}<div class="layui-form-mid layui-word-aux">{$hsv['tips']|raw}</div>{/if}
+    </div>
+{/case}

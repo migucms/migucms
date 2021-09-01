@@ -1,0 +1,19 @@
+<?php
+namespace {%namespace%}\model;
+
+use app\common\model\Base;
+
+/**
+ * {%classTitle%}模型
+ * @package {%namespace%}\model
+ */
+class {%className%} extends Base
+{
+    {%softDelete%}
+    // 自动写入时间戳
+    protected $autoWriteTimestamp = {%autoWriteTimestamp%};
+
+    // 定义时间戳字段名
+    protected $createTime = 'create_time';
+    protected $updateTime = 'update_time';
+}

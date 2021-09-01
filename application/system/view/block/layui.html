@@ -1,0 +1,7 @@
+<script src="__PUBLIC_JS__/layui/layui.js?v={:config('mgcms.version')}"></script>
+<script>
+    layui.config({
+    	base: '__ADMIN_JS__/',
+        version: '{:MIGU_VERSION}'
+    }).use({:json_encode(array_unique(parse_attr("global,".config('sys.admin_js'))))});
+</script>

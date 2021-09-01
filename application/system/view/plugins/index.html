@@ -1,0 +1,47 @@
+<div class="layui-row layui-col-space10 migu-app-row">
+    {if (!$plugins)}
+        <div class="migu-no-data-tips">
+            未发现相关插件，快去<a href="{:url('store/index')}?type=2"> <strong style="color:#428bca">应用市场</strong> </a>看看吧！
+        </div>
+    {/if}
+    {volist name="$plugins" id="vo"}
+        <div class="layui-col-md4">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    <span><img src="{$vo['icon']}" onerror="this.src='__ADMIN_IMG__/app.png';" width="20" height="20" /></span>
+                    <span>{$vo['title']}</span>
+                    <span class="version">v{$vo['version']}</span>
+                </div>
+                <div class="layui-card-body">
+                    <p>{$vo['intro']}</p>
+                </div>
+                <div class="layui-card-header btns">
+                            {switch name="vo['status']"}
+                                {case value="0"}
+                                    <div class="fr">
+                                        <a href="{:url('install?id='.$vo['id'])}" class="layui-btn layui-btn-normal layui-btn-sm migu-ajax">安装</a><a href="{:url('del?id='.$vo['id'])}" class="layui-btn layui-btn-danger layui-btn-sm migu-ajax" confirm="你确定要执行删除吗？">删除</a>
+                                    </div>
+                                {/case}
+                                {case value="1"}
+                                    <div class="fl">
+                                        <a href="{:url('system/plugins/status', ['id' => $vo['id'], 'val' => 2])}" class="layui-btn layui-btn-sm layui-btn-normal">启用</a>
+                                    </div>
+                                    <div class="fr">
+                                        {if condition="!empty($vo['config'])"}<a href="{:url('setting?id='.$vo['id'])}" class="layui-btn layui-btn-primary layui-btn-sm">配置</a>{/if}{if condition="$vo['app_keys']"}<a href="{:url('upgrade/lists?app_type=plugins&identifier='.$vo['identifier'])}" class="layui-btn layui-btn-primary layui-btn-sm">升级</a>{/if}<a href="{:url('uninstall?id='.$vo['id'])}" class="layui-btn layui-btn-danger layui-btn-sm migu-ajax">卸载</a>
+                                    </div>
+                                {/case}
+                                {case value="2"}
+                                    <div class="fl">
+                                        <a href="{:url('system/plugins/status', ['id' => $vo['id'], 'val' => 1])}" class="layui-btn layui-btn-sm layui-btn-warm">禁用</a>
+                                    </div>
+                                    <div class="fr">
+                                        {if condition="!empty($vo['config'])"}<a href="{:url('setting?id='.$vo['id'])}" class="layui-btn layui-btn-primary layui-btn-sm">配置</a>{/if}{if condition="$vo['app_keys']"}<a href="{:url('upgrade/lists?app_type=plugins&identifier='.$vo['identifier'])}" class="layui-btn layui-btn-primary layui-btn-sm">升级</a>{/if}<a href="{:url('uninstall?id='.$vo['id'])}" class="layui-btn layui-btn-danger layui-btn-sm migu-ajax">卸载</a>
+                                    </div>
+                                {/case}
+                            {/switch}
+                </div>
+            </div>
+        </div>
+    {/volist}
+</div>
+{include file="block/layui" /}

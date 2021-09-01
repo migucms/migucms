@@ -1,0 +1,10 @@
+<?php
+
+namespace {%namespace%};
+
+use app\common\service\Base;
+
+class {%className%} extends Base
+{
+    
+}

@@ -1,0 +1,20 @@
+<?php
+/**
+ * 模块菜单
+ * 字段说明
+ * url 【链接地址】格式：{$data['name']}/控制器/方法，可填写完整外链[必须以http开头]
+ * param 【扩展参数】格式：a=123&b=234555
+ */
+return [
+    [
+        'pid'           => 0,
+        'title'         => '{%title%}',
+        'icon'          => 'fa fa-cog',
+        'module'        => '{%app%}',
+        'url'           => '{%app%}',
+        'param'         => '',
+        'target'        => '_self',
+        'nav'           => 1,
+        'sort'          => 100,
+    ],
+];

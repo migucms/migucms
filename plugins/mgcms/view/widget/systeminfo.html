@@ -1,0 +1,83 @@
+<table class="tbinfo pleft layui-table" >
+        <thead>
+            <th colspan="4">系统公告</th>
+        </thead>
+        <tbody id="annou"></tbody>
+</table>
+<table class="layui-table" lay-skin="line">
+    <colgroup>
+        <col width="160">
+        <col>
+    </colgroup>
+    <thead>
+        <tr>
+            <th colspan="2">系统信息</th>
+        </tr> 
+    </thead>
+    <tbody>
+        <tr>
+            <td align="right">Mgcms版本</td>
+            <td>Pro {:MIGU_VERSION} <a href="{:url('upgrade/index')}" class="mcolor">检查新版本</a></td>
+        </tr>
+        <tr>
+            <td align="right">MySql版本</td>
+            <td>MySql {:db()->query('select version() as version')[0]['version']}</td>
+        </tr>
+        <tr>
+            <td align="right">PHP版本</td>
+            <td>PHP {$Think.const.PHP_VERSION} </td>
+        </tr>
+        <tr>
+            <td align="right">TP版本</td>
+            <td><?php echo \think\facade\App::version(); ?></td>
+        </tr>
+        <tr>
+            <td align="right">服务器环境</td>
+            <td>{$Think.const.PHP_OS} / {$_SERVER["SERVER_SOFTWARE"]}</td>
+        </tr>
+    </tbody>
+</table>
+<script src="/static/js/layui/layui.js?v=2.0.24"></script>
+<script type="text/javascript">
+
+    layui.use(['form','upload', 'layer','colorpicker'], function () {
+        // 操作对象
+        var form = layui.form
+                , layer = layui.layer
+                , $ = layui.jquery
+                ,element = layui.element;
+        $(function(){
+
+            $.ajax({
+                url:"//cloud.migucms.com/annou",
+                type:"get",
+                dataType:"json",
+                headers : {'Content-Type' : 'application/json;charset=utf-8'}, //接口json格式
+                success:function(data){
+                    if(data.code == 200){
+                        var addData = '';
+                        var list  = data.list;
+                        for(var i = 0 ; i < list.length ; i++){
+                            if (list[i].url==null) {
+                                list[i].url='#';
+                            }
+                            addData += '<tr><td colspan="4"><font class="tit s20"><a href="'+list[i].url+'" target="_blank">'+list[i].content+'  '+list[i].ctime+'</a></font></td></tr>'
+                            
+                        }
+                        $('#annou').append(addData);
+                        element.init();
+                    }
+                },
+                error:function(data){
+                    layer.alert(JSON.stringify(data), {
+                        title: data
+                    });
+                }
+            });
+
+        })
+
+    });
+    
+</script>
+

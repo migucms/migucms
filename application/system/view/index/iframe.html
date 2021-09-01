@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>管理控制台 -  Powered by {:config('mgcms.name')}</title>
+    {include file="system@block/head" /}
+    <script>
+        var HSIFRAME = true;
+    </script>
+</head>
+<body>
+    <div class="{if (cookie('migu_menu_layout') == 1)}migu-menu-layout{/if}" id="migu-layout">
+        {include file="system@block/menu" /}
+        <div class="migu-body migu-iframe{:input('cookie.migu_iframe', 0)}">
+            <div class="hs-tabs-item hs-tabs-item0">
+                <iframe src="{:url($homepage)}?migu_iframe=yes" frameborder="0" class="migu-body-iframe"></iframe>   
+            </div>
+        </div>
+        <div class="migu-body-shade"></div>
+    </div>
+    {include file="system@block/layui" /}
+</body>
+</html>

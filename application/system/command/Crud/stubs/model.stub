@@ -1,0 +1,31 @@
+<?php
+namespace {%namespace%}\model;
+
+use app\common\model\Base;
+{%useSoftDelete%}
+
+/**
+ * {%classTitle%}模型
+ * @package {%namespace%}\model
+ */
+class {%className%} extends Base
+{
+    {%softDelete%}
+    // 自动写入时间戳
+    protected $autoWriteTimestamp = {%autoWriteTimestamp%};
+
+    // 定义时间戳字段名
+    protected $createTime = 'create_time';
+    protected $updateTime = 'update_time';
+
+	// 设置json类型字段
+	protected $json = {%jsonFields%};
+    
+    // 设置JSON数据返回数组
+    protected $jsonAssoc = true;
+    {%checkboxAttr%}
+    {%timestampAttr%}
+    {%defineTable%}
+    {%definePK%}
+    {%relationMethod%}
+}
