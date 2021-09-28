@@ -39,7 +39,7 @@ class Cloud
     public $type = 'post';
 
     //服务器地址
-    const API_URL = 'http://cloud.migucms.com/';
+    const API_URL = 'https://cloud.migucms.com/';
     
     /**
      * 架构函数
