@@ -50,9 +50,9 @@
 
             $.ajax({
                 url:"//cloud.migucms.com/annou",
-                type:"get",
-                dataType:"json",
-                headers : {'Content-Type' : 'application/json;charset=utf-8'}, //接口json格式
+                type:"POST",
+                dataType: 'json',  
+                crossDomain: true, 
                 success:function(data){
                     if(data.code == 200){
                         var addData = '';
