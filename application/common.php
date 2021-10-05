@@ -17,7 +17,6 @@ use think\facade\Config;
 
 // 加载自定义函数库
 include Env::get('app_path').'function.php';
-
 if (!function_exists('get_layer')) {
     /**
      * 自动获取层前缀
@@ -709,7 +708,7 @@ if (!function_exists('module_config')) {
             return false;
         }
 
-        return include_once $path;
+        return include $path;
     }
 }
 
@@ -866,7 +865,6 @@ if (!function_exists('plugins_url')) {
         }
     }
 }
-
 // +----------------------------------------------------------------------
 // | 插件相关函数 end
 // +----------------------------------------------------------------------
