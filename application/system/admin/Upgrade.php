@@ -13,6 +13,7 @@ namespace app\system\admin;
 
 use app\system\model\SystemModule as ModuleModel;
 use app\system\model\SystemPlugins as PluginsModel;
+use app\system\model\SystemMenu as MenuModel;
 use migu\Cloud;
 use migu\Dir;
 use migu\PclZip;
@@ -296,7 +297,7 @@ class Upgrade extends Admin
         //备份旧文件
         foreach ($upInfo['update'] as $k => $v) {
             $v = trim($v, '/');
-            $_dir = $backPath.dirname($v).'/';
+            $_dir = $backPath.'/'.dirname($v).'/';
             if (!is_dir($_dir)) {
                 Dir::create($_dir, 0777);
             }
@@ -362,11 +363,6 @@ class Upgrade extends Admin
         $_version   = cache($this->cacheUpgradeList);
         $_version   = $_version['data'];
         $md5file    = md5_file($file);
-        // if($md5file != $_version[$version]['md5']) {
-        //     Dir::delDir($this->updatePath);
-        //     $this->error = '文件不完整，请重新升级！';
-        //     return false;
-        // }
         if (!is_dir($backPath)) {
             Dir::create($backPath);
         }
@@ -375,7 +371,6 @@ class Upgrade extends Admin
         if (!is_dir($decomPath)) {
             Dir::create($decomPath, 0777);
         }
-
         // 解压升级包
         $archive = new PclZip();
         $archive->PclZip($file);
@@ -394,7 +389,7 @@ class Upgrade extends Admin
         if (isset($upInfo['update'])) {
             foreach ($upInfo['update'] as $k => $v) {
                 $v  = trim($v, '/');
-                $dir = $backPath.dirname($v).'/';
+                $dir = $backPath.'/'.dirname($v).'/';
                 if (!is_dir($dir)) {
                     Dir::create($dir, 0777);
                 }
@@ -464,7 +459,20 @@ class Upgrade extends Admin
             }
             $newConfig = json_encode($newConfig, 1);
         }
-
+        if (is_file($this->appPath.$this->appInfo['name'].'/menu.php')) {
+            // 删除当前模块菜单
+            MenuModel::where('module', $this->appInfo['name'])->delete();
+            $menus = include $this->appPath.$this->appInfo['name'].'/menu.php';
+            // 如果不是数组且不为空就当JSON数据转换
+            if (!is_array($menus) && !empty($menus)) {
+                $menus = json_decode($menus, 1);
+            }
+            if (MenuModel::import($menus,$this->appInfo['name']) == false) {
+                // 执行回滚
+                MenuModel::where('module',$this->appInfo['name'])->delete();
+                return '添加菜单失败，请重新安装';
+            }
+        }
         // 导入SQL
         $sqlFile = realpath($decomPath.'/database.sql');
         if (is_file($sqlFile)) {
@@ -552,7 +560,7 @@ class Upgrade extends Admin
         //备份需要升级的旧版本
         foreach ($upInfo['update'] as $k => $v) {
             $v = trim($v, '/');
-            $_dir = $backPath.dirname($v).'/';
+            $_dir = $backPath.'/'.dirname($v).'/';
             if (!is_dir($_dir)) {
                 Dir::create($_dir, 0777);
             }
