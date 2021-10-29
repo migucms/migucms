@@ -112,7 +112,7 @@ VALUES
 	(46,1,'base','网站名称','site_name','咪咕CMS','input','','','将显示在浏览器窗口标题等位置',5,1,1494692103,1494694680),
 	(47,1,'base','网站LOGO','site_logo','/static/system/image/logo.png','image','','','网站LOGO图片',6,1,1494692345,1494693235),
 	(48,1,'base','网站图标','site_favicon','','image','','/system/annex/favicon','用于浏览器的地址栏展示，&lt;strong class=&quot;red&quot;&gt;.ico格式&lt;/strong&gt;，&lt;a href=&quot;https://www.baidu.com/s?ie=UTF-8&amp;wd=favicon&quot; target=&quot;_blank&quot;&gt;点此了解&lt;/a&gt;',7,1,1494692781,1494693966),
-	(49,1,'base','手机网站','wap_site_status','1','switch','0:关闭\r\n1:开启','','如果有手机网站，请设置为开启状态',3,1,1498405436,1498405436),
+	(49,1,'base','手机网站','wap_site_status','0','switch','0:关闭\r\n1:开启','','如果有手机网站，请设置为开启状态',3,1,1498405436,1498405436),
 	(50,1,'sys','云端推送','cloud_push','0','switch','0:关闭\r\n1:开启','','关闭之后，无法通过云端推送安装扩展',5,1,1504250320,1504250320),
 	(51,1,'base','手机域名','wap_domain','http://m.test.com','input','','','手机访问将自动跳转至此域名',4,1,1504304776,1504304837),
 	(52,1,'sys','多语言支持','multi_language','0','switch','0:关闭\r\n1:开启','','开启后你可以自由上传多种语言包',6,1,1506532211,1506532211),

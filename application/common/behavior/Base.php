@@ -29,7 +29,7 @@ class Base
 {
     public function run()
     {
-        define('MIGU_VERSION', '2.0.37');
+        define('MIGU_VERSION', '2.0.38');
         define('ROOT_PATH', Env::get('root_path'));
         define('IN_SYSTEM', true);
         define('ROOT_DIR', '/');

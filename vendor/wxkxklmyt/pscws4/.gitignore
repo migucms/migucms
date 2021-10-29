@@ -1,5 +1,0 @@
-/vendor/
-/tests/
-composer.lock
-.*
-!.gitignore
