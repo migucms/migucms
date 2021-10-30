@@ -44,6 +44,31 @@ class Index extends Admin
             return $this->fetch();
         }
     }
+    /**
+     * 自定义菜单
+     * @author Author: btc
+     * @return mixed
+     */
+    public function quickmenu(){
+        if($this->request->isPost()){
+            $quickmenu = $this->request->post('quickmenu');
+            $quickmenu = str_replace(chr(10),'',$quickmenu);
+            $menu_arr = explode(chr(13),$quickmenu);
+            $menu_arr=var_export($menu_arr,true);
+            $file = Env::get('config_path').'quickmenu.php';
+            $str = "<?php\nreturn $menu_arr;\n";
+            @chmod($file, 0755);
+            @file_put_contents($file, $str);
+            @chmod($file, 0555);
+            return $this->success('保存成功!');
+        }else{
+            $config_menu = config()['quickmenu'];
+            $quickmenu = array_values($config_menu);
+            $quickmenu = join(chr(13),$quickmenu);
+            $this->assign('quickmenu',$quickmenu);
+            return $this->fetch();
+        }
+    }
 
     /**
      * 欢迎首页

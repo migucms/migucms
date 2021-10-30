@@ -92,7 +92,25 @@ class Admin extends Common
             if (!$this->request->isAjax()) {
                 $languages = (new LangModel)->lists();
                 $menus = MenuModel::getAdminMenu();
+                
+                $quickmenu = config()['quickmenu'];
+                $quickmenu_list=[];
+                foreach($quickmenu as $k=>$v){
+                    if(empty($v)){
+                        continue;
+                    }
+                    $one = explode(',',trim($v));
+                    if(substr($one[1],0,4)=='http' || substr($one[1],0,2)=='//'){
 
+                    }elseif(substr($one[1],0,1) =='/'){
+
+                    }elseif(strpos($one[1],'###')!==false || strpos($one[1],'javascript:')!==false){
+
+                    }else{
+                        $one[1] = url($one[1]);
+                    }
+                    $menus[0]['childs'][$k+14] = ['id'=>$k+'999999','pid'=>2,'module'=>'system','title'=>$one[0],'url'=>$one[1],'param'=>'','target'=>'_self','icon'=>'hs-icon hs-icon-upgrade'];
+                }
                 $assign = [
                     'miguCurMenu' => $curMenu,
                     'miguMenus' => $menus,
@@ -107,6 +125,25 @@ class Admin extends Common
                 $this->view->engine->layout('system@layout');
                 $this->assign($assign);
             }
+            $quickmenu = config()['quickmenu'];
+            $quickmenu_list=[];
+            foreach($quickmenu as $k=>$v){
+                if(empty($v)){
+                    continue;
+                }
+                $one = explode(',',trim($v));
+                if(substr($one[1],0,4)=='http' || substr($one[1],0,2)=='//'){
+
+                }elseif(substr($one[1],0,1) =='/'){
+
+                }elseif(strpos($one[1],'###')!==false || strpos($one[1],'javascript:')!==false){
+
+                }else{
+                    $one[1] = url($one[1]);
+                }
+                $quickmenu_list[ $k] = ['name'=>$one[0], 'url'=>$one[1]];
+            }
+            $this->assign('quickmenu_list',$quickmenu_list);
         }
     }
 

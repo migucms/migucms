@@ -62,7 +62,7 @@ class Publics extends Common
             }
 
             session('admin_login_error', 0);
-            cookie('migu_iframe', 0);
+            cookie('migu_iframe', 1);
             cookie('migu_menu_layout', 1);
             return $this->success('登陆成功，页面跳转中...', url('index/index'));
 
