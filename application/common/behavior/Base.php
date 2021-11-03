@@ -29,7 +29,7 @@ class Base
 {
     public function run()
     {
-        define('MIGU_VERSION', '2.0.39');
+        define('MIGU_VERSION', '2.0.40');
         define('ROOT_PATH', Env::get('root_path'));
         define('IN_SYSTEM', true);
         define('ROOT_DIR', '/');
@@ -41,6 +41,7 @@ class Base
         
         // 获取当前模块名称
         $module = strtolower(Request::module());
+
         
         // 安装操作直接return
         if (defined('INSTALL_ENTRANCE')) {

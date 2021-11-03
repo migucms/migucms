@@ -36,8 +36,11 @@ class Init
                 $module     = $path[0];
                 $controller = parse_name((isset($path[1]) ? $path[1] : 'index'), 1);
                 $action     = lcfirst(parse_name((isset($path[2]) ? $path[2] : 'index'), 1));
-                $action     = str_replace('.'.config('app.url_html_suffix'), '', $action);
-
+                $action     = str_replace('.html', '', $action);
+                $action     = str_replace('.htm', '', $action);
+                $action     = str_replace('.shtm', '', $action);
+                $action     = str_replace('.shtml', '', $action);
+                $action     = str_replace('.xml', '', $action);
                 if (method_exists("app\\{$module}\\home\\{$controller}", $action)) {
                     $bind = true;
                 } elseif (method_exists("app\\{$module}\\home\\{$controller}", parse_name($action))) {

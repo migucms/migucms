@@ -125,25 +125,6 @@ class Admin extends Common
                 $this->view->engine->layout('system@layout');
                 $this->assign($assign);
             }
-            $quickmenu = config()['quickmenu'];
-            $quickmenu_list=[];
-            foreach($quickmenu as $k=>$v){
-                if(empty($v)){
-                    continue;
-                }
-                $one = explode(',',trim($v));
-                if(substr($one[1],0,4)=='http' || substr($one[1],0,2)=='//'){
-
-                }elseif(substr($one[1],0,1) =='/'){
-
-                }elseif(strpos($one[1],'###')!==false || strpos($one[1],'javascript:')!==false){
-
-                }else{
-                    $one[1] = url($one[1]);
-                }
-                $quickmenu_list[ $k] = ['name'=>$one[0], 'url'=>$one[1]];
-            }
-            $this->assign('quickmenu_list',$quickmenu_list);
         }
     }
 
