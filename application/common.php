@@ -17,6 +17,25 @@ use think\facade\Config;
 
 // 加载自定义函数库
 include Env::get('app_path').'function.php';
+if (!function_exists('base64EncodeImage')) {
+    /**
+     * 图片转换为base64
+     * @param string $image_file 图片路径
+     */
+    function base64EncodeImage($image_file)
+    {
+        
+        $base64_image = '';
+        if(substr($image_file,0,4) != 'http' && substr($image_file,0,2) != '//'){
+            $image_file='./'.$image_file;
+        }
+        $image_info = getimagesize($image_file);
+        $image_data = fread(fopen($image_file, 'r'), filesize($image_file));
+        $base64_image = 'data:' . $image_info['mime'] . ';base64,' . chunk_split(base64_encode($image_data));
+        return $base64_image;
+
+    }
+}
 if (!function_exists('get_layer')) {
     /**
      * 自动获取层前缀

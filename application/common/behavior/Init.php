@@ -41,7 +41,9 @@ class Init
                 $action     = str_replace('.shtm', '', $action);
                 $action     = str_replace('.shtml', '', $action);
                 $action     = str_replace('.xml', '', $action);
-                if (method_exists("app\\{$module}\\home\\{$controller}", $action)) {
+                if($controller=='Label'){
+                    $bind = true;
+                } elseif (method_exists("app\\{$module}\\home\\{$controller}", $action)) {
                     $bind = true;
                 } elseif (method_exists("app\\{$module}\\home\\{$controller}", parse_name($action))) {
                     $bind = true;

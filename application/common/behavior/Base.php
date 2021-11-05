@@ -29,7 +29,7 @@ class Base
 {
     public function run()
     {
-        define('MIGU_VERSION', '2.0.40');
+        define('MIGU_VERSION', '2.0.41');
         define('ROOT_PATH', Env::get('root_path'));
         define('IN_SYSTEM', true);
         define('ROOT_DIR', '/');
@@ -55,7 +55,6 @@ class Base
         // 系统配置
         $config = ConfigModel::getConfig();
         Config::set(array_merge($pluginsConf, $moduleConf, $config));
-
         // 判断模块是否存在且已安装
         $theme = 'default';
         if (in_array($module, ['index', 'system']) === false) {
