@@ -543,7 +543,12 @@ UPDATE {pre}video_vod SET vod_hits=1 WHERE vod_id=1000 指定的第几条数据�
             $tostr = $param['tostr'];
             $where = $param['where'];
             if(!empty($table) && !empty($field) && !empty($findstr) && !empty($tostr) && !empty($where)){
-                $sql = "UPDATE ".$table." set ".$field."=Replace(".$field.",'".$findstr."','".$tostr."') where 1=1 ". $where;
+                $sql = "UPDATE ".$table." set ".$field."=Replace(".$field.",'".$findstr."','".$tostr."') where ".$where;
+                Db::execute($sql);
+                return $this->success('执行成功');
+            }
+            if(!empty($table) && !empty($field) && !empty($findstr) && !empty($tostr)){
+                $sql = "UPDATE ".$table." set ".$field."=Replace(".$field.",'".$findstr."','".$tostr."') where 1=1";
                 Db::execute($sql);
                 return $this->success('执行成功');
             }
